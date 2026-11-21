@@ -180,10 +180,6 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
                   </div>
                 </div>
 
-                <p className="font-body-script text-xs text-[#675d52] line-clamp-2 mt-1 leading-snug">
-                  {stripHtml(note.content) || (isRtl ? 'صفحة مسودة خالية...' : 'Blank folio page...')}
-                </p>
-
                 <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#e5e2dc]/40 text-[10px] font-label-mono text-[#675d52]/70">
                   <span className="uppercase">{t(`notes.categories.${note.category}`, note.category)}</span>
                   <span>{note.date || (isRtl ? 'بدون تاريخ' : 'Undated')}</span>
