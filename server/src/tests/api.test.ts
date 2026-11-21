@@ -21,7 +21,11 @@ describe('Digital Paper Agenda API', () => {
     expect(res.status).toBe(200);
     expect(res.body.date).toBe('2025-10-15');
     expect(res.body.priorities).toBeInstanceOf(Array);
-    expect(res.body.priorities.length).toBe(3);
+    // Only real priorities are returned; empty days have no placeholder slots.
+    expect(res.body.priorities.length).toBeLessThanOrEqual(3);
+    expect(
+      res.body.priorities.every((p: { id: string }) => !p.id.startsWith('temp-'))
+    ).toBe(true);
     expect(res.body.tasks).toBeInstanceOf(Array);
     expect(res.body.events).toBeInstanceOf(Array);
   });

@@ -41,27 +41,12 @@ export class AgendaService {
       this.getSettings(),
     ]);
 
-    // Ensure 3 priority slots exist or can be rendered
-    const fullPriorities = [1, 2, 3].map((pos) => {
-      const existing = priorities.find((p) => p.position === pos);
-      return (
-        existing || {
-          id: `temp-${dateStr}-${pos}`,
-          date: dateStr,
-          position: pos,
-          title: '',
-          isCompleted: false,
-          category: null,
-        }
-      );
-    });
-
     return {
       date: dateStr,
       dayOfYear,
       totalDays: 365,
       weekNumber,
-      priorities: fullPriorities,
+      priorities,
       events,
       tasks,
       dailyNote: dailyNote || {

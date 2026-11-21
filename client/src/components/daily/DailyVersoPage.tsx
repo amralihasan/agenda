@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays, subDays } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -48,7 +48,22 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
   const [editingPos, setEditingPos] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
 
+  useEffect(() => {
+    setEditingPos(null);
+    setEditingTitle('');
+  }, [date]);
+
   const romanNumerals = isRtl ? ['١.', '٢.', '٣.'] : ['I.', 'II.', 'III.'];
+
+  const sortedPriorities = [...priorities].sort((a, b) => a.position - b.position);
+  const usedPositions = new Set(sortedPriorities.map((p) => p.position));
+  const nextAvailablePosition =
+    [1, 2, 3].find((pos) => !usedPositions.has(pos)) ?? null;
+  // A draft being edited at a position that has no saved priority yet.
+  const isAddingNew = editingPos !== null && !usedPositions.has(editingPos);
+  const displayPositions = Array.from(usedPositions);
+  if (isAddingNew && editingPos !== null) displayPositions.push(editingPos);
+  displayPositions.sort((a, b) => a - b);
 
   // Format hours array based on settings
   const hours: string[] = [];
@@ -154,8 +169,8 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
           </div>
 
           <div className="space-y-1.5 font-body-script text-base text-[#1c1c18]">
-            {[1, 2, 3].map((pos) => {
-              const p = priorities.find((item) => item.position === pos);
+            {displayPositions.map((pos) => {
+              const p = sortedPriorities.find((item) => item.position === pos);
               const isCompleted = p?.isCompleted ?? false;
               const title = p?.title ?? '';
               const roman = romanNumerals[pos - 1];
@@ -291,19 +306,21 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                       </>
                     )}
 
-                    {(!p || !title) && (
-                      <button
-                        type="button"
-                        onClick={() => handleStartEditPriority(pos, '')}
-                        className="text-[11px] font-label-stamp text-[#832613] px-2 py-0.5 rounded border border-[#832613]/20 bg-[#fdfbf7] hover:bg-[#832613] hover:text-white transition-all cursor-pointer"
-                      >
-                        + {isRtl ? 'إضافة' : 'Add'}
-                      </button>
-                    )}
                   </div>
                 </div>
               );
             })}
+
+            {editingPos === null && nextAvailablePosition !== null && (
+              <button
+                type="button"
+                onClick={() => handleStartEditPriority(nextAvailablePosition, '')}
+                className="flex items-center gap-1.5 text-[11px] font-label-stamp uppercase tracking-wider text-[#832613] px-2.5 py-1 rounded border border-dashed border-[#832613]/40 bg-[#fdfbf7] hover:bg-[#832613] hover:text-white transition-all cursor-pointer"
+              >
+                <Plus className="w-3 h-3" />
+                <span>{t('daily.addPriority')}</span>
+              </button>
+            )}
           </div>
         </section>
 

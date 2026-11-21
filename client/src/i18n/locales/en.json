@@ -34,6 +34,7 @@
     "notesTag": "MEMORANDA",
     "addTaskPlaceholder": "Inscribe task or reminder upon this line...",
     "addPriorityPlaceholder": "Inscribe high priority objective...",
+    "addPriority": "Add Priority",
     "addEventPrompt": "Click empty line to inscribe an appointment",
     "emptyEventPrompt": "Inscribe new hour slot...",
     "completed": "Completed",

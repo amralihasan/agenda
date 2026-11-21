@@ -34,6 +34,7 @@
     "notesTag": "المذكرات",
     "addTaskPlaceholder": "خطَّ التزاماً أو مهمة جديدة على هذا السطر...",
     "addPriorityPlaceholder": "خطَّ أولوية كبرى...",
+    "addPriority": "إضافة أولوية",
     "addEventPrompt": "انقر على السطر لتدوين موعد أو التزام زمني",
     "emptyEventPrompt": "تدوين موعد جديد...",
     "completed": "تم",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { HeaderBanner } from './components/book/HeaderBanner';
@@ -62,6 +62,21 @@ export const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
 
+  // Guard note refreshes so a slow response cannot overwrite local edits/creates.
+  const notesFetchIdRef = useRef(0);
+  const notesMutationIdRef = useRef(0);
+
+  const loadNotes = useCallback(async () => {
+    const fetchId = ++notesFetchIdRef.current;
+    const mutationIdAtStart = notesMutationIdRef.current;
+    const data = await api.getNotes();
+    const isStillLatest = fetchId === notesFetchIdRef.current;
+    const noLocalMutationSinceStart = mutationIdAtStart === notesMutationIdRef.current;
+    if (isStillLatest && noLocalMutationSinceStart) {
+      setNotes(data);
+    }
+  }, []);
+
   // Initial load: settings, notes & categories
   useEffect(() => {
     api.getSettings().then((s) => {
@@ -72,9 +87,9 @@ export const App: React.FC = () => {
       }
     }).catch(console.error);
 
-    api.getNotes().then(setNotes).catch(console.error);
+    loadNotes().catch(console.error);
     api.getCategories().then(setCategories).catch(console.error);
-  }, []);
+  }, [loadNotes]);
 
   // Fetch daily agenda whenever date changes
   const loadDailyAgenda = useCallback(async (dateStr: string) => {
@@ -116,9 +131,9 @@ export const App: React.FC = () => {
     } else if (activeSection === 'monthly') {
       loadMonthlyAgenda(currentDate);
     } else if (activeSection === 'notes') {
-      api.getNotes().then(setNotes).catch(console.error);
+      loadNotes().catch(console.error);
     }
-  }, [currentDate, activeSection, loadDailyAgenda, loadWeeklyAgenda, loadMonthlyAgenda]);
+  }, [currentDate, activeSection, loadDailyAgenda, loadWeeklyAgenda, loadMonthlyAgenda, loadNotes]);
 
   // Priority actions
   const handleTogglePriority = async (p: DailyPriority) => {
@@ -141,11 +156,12 @@ export const App: React.FC = () => {
 
   const handleSavePriority = async (position: number, title: string) => {
     try {
+      const existing = dailyData?.priorities.find((item) => item.position === position);
       const saved = await api.upsertPriority({
         date: currentDate,
         position,
         title,
-        isCompleted: false,
+        isCompleted: existing?.isCompleted ?? false,
       });
       setDailyData((prev) => {
         if (!prev) return prev;
@@ -166,17 +182,17 @@ export const App: React.FC = () => {
   const handleDeletePriority = async (id: string) => {
     try {
       await api.deletePriority(id);
-      const remaining = (dailyData?.priorities || []).filter((item) => item.id !== id);
+      const remaining = (dailyData?.priorities || [])
+        .filter((item) => item.id !== id)
+        .sort((a, b) => a.position - b.position);
       const reindexed: DailyPriority[] = [];
       for (let i = 0; i < remaining.length; i++) {
         const targetPos = i + 1;
         if (remaining[i].position !== targetPos) {
-          const updated = await api.upsertPriority({
-            date: currentDate,
+          // Move the existing row instead of upserting, so a different
+          // priority occupying the target slot is never overwritten.
+          const updated = await api.updatePriority(remaining[i].id, {
             position: targetPos,
-            title: remaining[i].title,
-            isCompleted: remaining[i].isCompleted,
-            category: remaining[i].category || undefined,
           });
           reindexed.push(updated);
         } else {
@@ -333,17 +349,20 @@ export const App: React.FC = () => {
 
   // Notes actions
   const handleCreateNote = async (data: Partial<Note>) => {
+    notesMutationIdRef.current += 1;
     const newNote = await api.createNote(data);
     setNotes((prev) => [newNote, ...prev]);
     return newNote;
   };
 
   const handleUpdateNote = async (id: string, data: Partial<Note>) => {
+    notesMutationIdRef.current += 1;
     const updated = await api.updateNote(id, data);
     setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
   };
 
   const handleDeleteNote = async (id: string) => {
+    notesMutationIdRef.current += 1;
     await api.deleteNote(id);
     setNotes((prev) => prev.filter((n) => n.id !== id));
   };
