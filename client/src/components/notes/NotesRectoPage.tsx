@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Maximize2, Minimize2 } from 'lucide-react';
 import { Note } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
@@ -30,6 +30,25 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
   const [category, setCategory] = useState(activeNote?.category || 'General');
   const [date, setDate] = useState(activeNote?.date || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isFolioFullscreen, setIsFolioFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFolioFullscreen) {
+        setIsFolioFullscreen(false);
+      }
+    };
+    if (isFolioFullscreen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFolioFullscreen]);
 
   useEffect(() => {
     if (activeNote) {
@@ -73,12 +92,18 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
   }, [title, content, noteType, paperStyle, category, date, activeNote, onUpdateNote]);
 
   return (
-    <div className="flex-1 flex flex-col justify-between relative select-text">
+    <div
+      className={`flex-1 flex flex-col justify-between relative select-text transition-all duration-200 ${
+        isFolioFullscreen
+          ? 'fixed inset-0 z-[100] w-screen h-screen bg-[#fcf9f3] p-3 sm:p-6 lg:p-8 overflow-y-auto animate-in fade-in'
+          : ''
+      }`}
+    >
       {activeNote ? (
-        <div>
+        <div className="flex-1 flex flex-col">
           {/* Header Controls for Active Note */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-[#e5e2dc] gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {/* Paper Style Selector */}
               <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
                 <button
@@ -115,6 +140,23 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
                   {t('notes.blank')}
                 </button>
               </div>
+
+              {/* Fullscreen Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsFolioFullscreen(!isFolioFullscreen)}
+                className="px-2 py-1 rounded bg-[#f0eee8] hover:bg-[#e5e2dc] text-[#080c12] text-xs font-label-stamp flex items-center gap-1 transition-colors cursor-pointer border border-[#dcd8ce] shadow-2xs"
+                title={isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+              >
+                {isFolioFullscreen ? (
+                  <Minimize2 className="w-3.5 h-3.5 text-[#832613]" />
+                ) : (
+                  <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
+                )}
+                <span className="hidden sm:inline">
+                  {isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+                </span>
+              </button>
 
               {isSaving && (
                 <span className="font-label-mono text-[10px] text-[#832613] italic animate-pulse">

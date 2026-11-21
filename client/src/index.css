@@ -192,6 +192,59 @@
   padding: 0 4px;
   border-radius: 2px;
 }
+
+/* Inline Code in Rich Editor */
+.rich-note-editor code:not(pre code) {
+  background-color: #f1f5f9;
+  color: #832613;
+  padding: 0.12rem 0.35rem;
+  border-radius: 3px;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace !important;
+  font-size: 0.88em;
+  border: 1px solid #e2e8f0;
+}
+
+/* Embedded Jira-style Multiline Code Block inside Note */
+.embedded-code-block {
+  margin: 0.85rem 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.embedded-code-block .code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.65rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #64748b;
+  user-select: none;
+}
+
+.embedded-code-block pre {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background-color: #ffffff;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace !important;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #1f2328;
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 2;
+  outline: none;
+  border: none;
+  min-height: 48px;
+}
+
 .rich-note-editor blockquote {
   border-inline-start: 3px solid #832613;
   padding-inline-start: 12px;

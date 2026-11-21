@@ -88,11 +88,11 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#1a0302]/95 backdrop-blur-md border-b border-[#380a08] shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
       <div className="max-w-[1440px] mx-auto h-14 sm:h-16 px-3 sm:px-6 lg:px-10 flex items-center justify-between">
         {/* Left: Book Crest */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#490800] border border-[#832613]/50 flex items-center justify-center text-[#da664d] shadow-sm">
             <BookOpen className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
           </div>
-          <div>
+          <div className="hidden sm:block">
             <span className="font-caption-caps text-caption-caps uppercase text-[#d2c4b7] tracking-widest font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
               {t('app.title')}
             </span>
@@ -103,12 +103,12 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
         </div>
 
         {/* Center: Pagination & Date Indicator */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Previous Page Button - Always goes backward */}
           <button
             type="button"
             onClick={handlePrev}
-            className="flex items-center gap-1 font-label-mono text-xs text-[#d2c4b7] hover:text-[#fcf9f3] px-2 py-1 rounded transition-colors group cursor-pointer"
+            className="flex items-center gap-1 font-label-mono text-xs text-[#d2c4b7] hover:text-[#fcf9f3] p-1 sm:px-2 sm:py-1 rounded transition-colors group cursor-pointer"
             title={t('app.prevPage')}
           >
             {isRtl ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -118,7 +118,7 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
           {/* Today Button / Date Indicator */}
           <div
             onClick={handleToday}
-            className="flex items-center gap-1.5 font-label-stamp text-xs text-[#da664d] bg-[#490800]/50 hover:bg-[#490800] border border-[#da664d]/30 px-2 sm:px-3 py-1 rounded cursor-pointer transition-all shadow-inner whitespace-nowrap"
+            className="flex items-center gap-1 sm:gap-1.5 font-label-stamp text-[11px] sm:text-xs text-[#da664d] bg-[#490800]/50 hover:bg-[#490800] border border-[#da664d]/30 px-2 sm:px-3 py-1 rounded cursor-pointer transition-all shadow-inner whitespace-nowrap"
             title={t('app.today')}
           >
             <Calendar className="w-3.5 h-3.5 shrink-0" />
@@ -130,7 +130,7 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
           <button
             type="button"
             onClick={handleNext}
-            className="flex items-center gap-1 font-label-mono text-xs text-[#d2c4b7] hover:text-[#fcf9f3] px-2 py-1 rounded transition-colors group cursor-pointer"
+            className="flex items-center gap-1 font-label-mono text-xs text-[#d2c4b7] hover:text-[#fcf9f3] p-1 sm:px-2 sm:py-1 rounded transition-colors group cursor-pointer"
             title={t('app.nextPage')}
           >
             <span className="hidden lg:inline">{t('app.nextPage')}</span>
@@ -139,11 +139,11 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
         </div>
 
         {/* Right: Language switch & Settings */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
           <button
             type="button"
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#380a08]/80 hover:bg-[#490800] border border-[#da664d]/30 text-xs font-label-mono text-[#fcf9f3] transition-colors cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded bg-[#380a08]/80 hover:bg-[#490800] border border-[#da664d]/30 text-[11px] sm:text-xs font-label-mono text-[#fcf9f3] transition-colors cursor-pointer"
             title={isRtl ? 'تبديل اللغة (English / العربية)' : 'Switch Language (English / العربية)'}
           >
             <Languages className="w-3.5 h-3.5 text-[#da664d]" />
@@ -153,7 +153,7 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
           <button
             type="button"
             onClick={onOpenSettings}
-            className="w-8 h-8 rounded bg-[#380a08]/80 hover:bg-[#490800] border border-[#da664d]/30 flex items-center justify-center text-[#d2c4b7] hover:text-[#fcf9f3] transition-colors cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#380a08]/80 hover:bg-[#490800] border border-[#da664d]/30 flex items-center justify-center text-[#d2c4b7] hover:text-[#fcf9f3] transition-colors cursor-pointer"
             title={t('settings.title')}
           >
             <Settings className="w-4 h-4" />

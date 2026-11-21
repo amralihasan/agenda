@@ -78,7 +78,23 @@
     "highlightMode": "كود منسق وملوّن",
     "placeRibbon": "تثبيت شريط الحرير",
     "viewVerso": "ظهر الصحيفة (ص. اليسار)",
-    "viewRecto": "وجه الصحيفة (ص. اليمين)"
+    "viewRecto": "وجه الصحيفة (ص. اليمين)",
+    "viewVersoShort": "ظهر الصحيفة",
+    "viewRectoShort": "وجه الصحيفة",
+    "fullscreen": "ملء الشاشة",
+    "exitFullscreen": "خروج من ملء الشاشة",
+    "pressEscToExit": "اضغط Esc للخروج",
+    "codeStudio": "محرر الأكواد المتقدم",
+    "manuscriptEditor": "محرر الملاحظات المتقدم",
+    "insertCodeBlock": "إدراج كتلة كود",
+    "inlineCode": "كود سطري",
+    "textStyle": "نمط النص",
+    "formatting": "تنسيق",
+    "lists": "قوائم",
+    "highlighter": "تمييز اللون",
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "deleteCodeBlock": "حذف كتلة الكود"
   },
   "weekly": {
     "semestrialFocus": "أولويات وأهداف الأسبوع الكبرى",
@@ -119,6 +135,8 @@
     "blank": "ورق أملس خالي",
     "pin": "تثبيت الصفحة",
     "delete": "أرشفة / حذف",
+    "fullscreen": "ملء الشاشة",
+    "exitFullscreen": "خروج من ملء الشاشة",
     "category": "تصنيف الدفتر",
     "categories": {
       "all": "كافة الدفاتر",

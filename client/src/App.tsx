@@ -37,6 +37,7 @@ export const App: React.FC = () => {
   // Current selected date (defaults to today's date)
   const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [activeSection, setActiveSection] = useState<AgendaSection>('daily');
+  const [mobilePage, setMobilePage] = useState<'left' | 'right'>('left');
 
   // Server state
   const [dailyData, setDailyData] = useState<DailyAgendaResponse | null>(null);
@@ -478,11 +479,17 @@ export const App: React.FC = () => {
         searchQuery={notesSearchQuery}
         selectedCategory={notesCategory}
         categories={notesCategories}
-        onSelectNote={setSelectedNoteId}
+        onSelectNote={(id) => {
+          setSelectedNoteId(id);
+          setMobilePage('right');
+        }}
         onSearchChange={setNotesSearchQuery}
         onCategoryChange={setNotesCategory}
         onOpenCategoryManager={() => setIsCategoryManagerOpen(true)}
-        onCreateNewNote={handleCreateNewNoteQuick}
+        onCreateNewNote={async () => {
+          await handleCreateNewNoteQuick();
+          setMobilePage('right');
+        }}
         onTogglePin={async (note, e) => {
           e.stopPropagation();
           await handleUpdateNote(note.id, { isPinned: !note.isPinned });
@@ -520,9 +527,14 @@ export const App: React.FC = () => {
       <main className="w-full flex-1 pt-18 sm:pt-20 flex flex-col items-center justify-start">
         <AgendaBookSpread
           activeSection={activeSection}
-          onSelectSection={setActiveSection}
+          onSelectSection={(sec) => {
+            setActiveSection(sec);
+            setMobilePage('left');
+          }}
           leftPage={leftPageContent}
           rightPage={rightPageContent}
+          mobilePage={mobilePage}
+          onMobilePageChange={setMobilePage}
         />
       </main>
 
