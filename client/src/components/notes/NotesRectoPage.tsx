@@ -174,13 +174,6 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
               }`}
               style={{ lineHeight: '32px' }}
             />
-
-            {/* Red Letterpress Wax Seal Motif in Corner */}
-            <div className="absolute bottom-3 right-3 pointer-events-none opacity-20">
-              <div className="w-12 h-12 rounded-full border-2 border-[#832613] flex items-center justify-center text-[#832613] shadow-inner">
-                <span className="font-label-stamp text-[10px] font-bold">{isRtl ? 'طبعة خاصة' : 'EX LIBRIS'}</span>
-              </div>
-            </div>
           </div>
         </div>
       ) : (
