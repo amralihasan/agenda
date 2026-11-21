@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays, subDays } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, X } from 'lucide-react';
 import { DailyPriority, ScheduleEvent } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 
@@ -162,23 +162,40 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
 
               if (editingPos === pos) {
                 return (
-                  <div key={pos} className="flex items-center gap-2 py-0.5">
-                    <span className="font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 mr-1">
+                  <div key={pos} className="flex items-center gap-2 py-1 px-1.5 rounded bg-[#f6f3ed] border border-[#832613]/40 shadow-2xs">
+                    <span className="font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 select-none">
                       {roman}
                     </span>
                     <input
                       type="text"
                       value={editingTitle}
                       onChange={(e) => setEditingTitle(e.target.value)}
-                      onBlur={() => handleFinishEditPriority(pos)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') handleFinishEditPriority(pos);
                         if (e.key === 'Escape') setEditingPos(null);
                       }}
                       autoFocus
                       placeholder={t('daily.addPriorityPlaceholder')}
-                      className="flex-1 bg-transparent border-b border-[#832613] pb-0.5 font-body-script text-base text-[#080c12] focus:outline-none"
+                      className="flex-1 bg-transparent font-body-script text-base text-[#080c12] focus:outline-none placeholder:text-[#675d52]/40"
                     />
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleFinishEditPriority(pos)}
+                        className="p-1 text-[#16a34a] hover:bg-white rounded transition-colors"
+                        title={isRtl ? 'حفظ' : 'Save'}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingPos(null)}
+                        className="p-1 text-[#675d52] hover:bg-white rounded transition-colors"
+                        title={isRtl ? 'إلغاء' : 'Cancel'}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 );
               }
@@ -186,100 +203,104 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
               return (
                 <div
                   key={pos}
-                  onClick={() => handleStartEditPriority(pos, title)}
-                  className="flex items-baseline gap-2 group cursor-text py-0.5 hover:bg-[#f6f3ed]/60 px-1 rounded transition-colors"
-                  title={title ? '' : t('daily.addPriorityPlaceholder')}
+                  className="flex items-center justify-between gap-2 group py-1 hover:bg-[#f6f3ed]/70 px-1.5 rounded transition-all"
                 >
-                  <span
-                    onClick={(e) => {
-                      if (p && title) {
-                        e.stopPropagation();
-                        onTogglePriority(p);
-                      }
-                    }}
-                    className={`font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 select-none mr-1 ${
-                      p && title ? 'cursor-pointer hover:scale-105 transition-transform' : ''
-                    }`}
-                    title={
-                      p && title
-                        ? isCompleted
-                          ? t('daily.completed')
-                          : t('daily.priority')
-                        : ''
-                    }
+                  <div
+                    className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
+                    onClick={() => handleStartEditPriority(pos, title)}
                   >
-                    {roman}
-                  </span>
-
-                  <span
-                    className={`flex-1 transition-all select-none ${
-                      isCompleted
-                        ? 'line-through decoration-[#832613]/70 decoration-1 text-[#675d52] italic'
-                        : title
-                        ? 'text-[#080c12]'
-                        : 'text-[#675d52]/40 italic'
-                    }`}
-                  >
-                    {title || t('daily.addPriorityPlaceholder')}
-                  </span>
-
-                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      type="button"
+                    <span
                       onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartEditPriority(pos, title);
+                        if (p && title) {
+                          e.stopPropagation();
+                          onTogglePriority(p);
+                        } else {
+                          handleStartEditPriority(pos, '');
+                        }
                       }}
-                      className="p-1 hover:text-[#832613] text-[#675d52]"
-                      title={t('daily.editPriority')}
+                      className={`font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 select-none ${
+                        p && title ? 'hover:scale-110 transition-transform' : ''
+                      }`}
+                      title={
+                        p && title
+                          ? isCompleted
+                            ? t('daily.completed')
+                            : t('daily.priority')
+                          : t('daily.addPriorityPlaceholder')
+                      }
                     >
-                      <Edit3 className="w-3 h-3" />
-                    </button>
-                    {p && onDeletePriority && (
+                      {roman}
+                    </span>
+
+                    <span
+                      className={`flex-1 truncate transition-all font-body-script text-base ${
+                        isCompleted
+                          ? 'line-through decoration-[#832613]/70 decoration-1 text-[#675d52] italic'
+                          : title
+                          ? 'text-[#080c12] group-hover:text-[#832613]'
+                          : 'text-[#675d52]/40 italic group-hover:text-[#675d52]/70'
+                      }`}
+                      title={title ? (isRtl ? 'انقر لتعديل الأولوية' : 'Click to edit priority') : t('daily.addPriorityPlaceholder')}
+                    >
+                      {title || t('daily.addPriorityPlaceholder')}
+                    </span>
+                  </div>
+
+                  {/* Action Controls: Edit, Delete, Status Badge */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {p && title && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartEditPriority(pos, title);
+                          }}
+                          className="p-1 text-[#675d52] hover:text-[#832613] hover:bg-[#e5e2dc]/60 rounded transition-colors"
+                          title={t('daily.editPriority')}
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        {onDeletePriority && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeletePriority(p.id);
+                            }}
+                            className="p-1 text-[#675d52] hover:text-[#ba1a1a] hover:bg-[#fee2e2] rounded transition-colors"
+                            title={t('daily.deletePriority')}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTogglePriority(p);
+                          }}
+                          className={`font-label-stamp text-[10px] uppercase tracking-wider shrink-0 select-none cursor-pointer hover:scale-105 transition-transform px-1.5 py-0.5 rounded border ${
+                            isCompleted
+                              ? 'text-[#16a34a] border-[#16a34a]/30 bg-[#f0fdf4]'
+                              : 'text-[#832613] border-[#832613]/25 bg-[#fdf2f0]'
+                          }`}
+                          title={isCompleted ? (isRtl ? 'تحديد كغير منجز' : 'Mark incomplete') : (isRtl ? 'تحديد كمنجز' : 'Mark completed')}
+                        >
+                          {isCompleted ? (isRtl ? 'تم' : 'Done') : (isRtl ? 'أولوية' : 'Priority')}
+                        </span>
+                      </>
+                    )}
+
+                    {(!p || !title) && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeletePriority(p.id);
-                        }}
-                        className="p-1 hover:text-[#ba1a1a] text-[#675d52]"
-                        title={t('daily.deletePriority')}
+                        onClick={() => handleStartEditPriority(pos, '')}
+                        className="text-[11px] font-label-stamp text-[#832613] px-2 py-0.5 rounded border border-[#832613]/20 bg-[#fdfbf7] hover:bg-[#832613] hover:text-white transition-all cursor-pointer"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        + {isRtl ? 'إضافة' : 'Add'}
                       </button>
                     )}
                   </div>
-
-                  {title && (
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (p) onTogglePriority(p);
-                      }}
-                      className={`font-label-stamp text-[10px] uppercase tracking-wider shrink-0 select-none cursor-pointer hover:scale-105 transition-transform ${
-                        isCompleted
-                          ? 'text-[#832613]'
-                          : p?.category === 'Urgent' || p?.category === 'عاجل'
-                          ? 'text-[#832613]'
-                          : 'text-[#675d52]'
-                      }`}
-                      title={
-                        isCompleted ? t('daily.completed') : t('daily.priority')
-                      }
-                    >
-                      {isCompleted
-                        ? t('daily.completed')
-                        : p?.category && p.category.trim() !== ''
-                        ? (p.category === 'Urgent' || p.category === 'عاجل'
-                            ? t('daily.urgent')
-                            : p.category === 'Complété' || p.category === 'Completed' || p.category === 'مُنجز' || p.category === 'تم'
-                            ? t('daily.completed')
-                            : p.category.toLowerCase() === 'priorité' || p.category.toLowerCase() === 'priority'
-                            ? t('daily.priority')
-                            : p.category)
-                        : t('daily.priority')}
-                    </span>
-                  )}
                 </div>
               );
             })}

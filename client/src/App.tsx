@@ -147,16 +147,17 @@ export const App: React.FC = () => {
         title,
         isCompleted: false,
       });
-      setDailyData((prev) =>
-        prev
-          ? {
-              ...prev,
-              priorities: prev.priorities.map((item) =>
-                item.position === position ? saved : item
-              ),
-            }
-          : prev
-      );
+      setDailyData((prev) => {
+        if (!prev) return prev;
+        const exists = prev.priorities.some((item) => item.position === position);
+        const nextList = exists
+          ? prev.priorities.map((item) => (item.position === position ? saved : item))
+          : [...prev.priorities, saved];
+        return {
+          ...prev,
+          priorities: nextList.sort((a, b) => a.position - b.position),
+        };
+      });
     } catch (err) {
       console.error(err);
     }
@@ -165,13 +166,25 @@ export const App: React.FC = () => {
   const handleDeletePriority = async (id: string) => {
     try {
       await api.deletePriority(id);
+      const remaining = (dailyData?.priorities || []).filter((item) => item.id !== id);
+      const reindexed: DailyPriority[] = [];
+      for (let i = 0; i < remaining.length; i++) {
+        const targetPos = i + 1;
+        if (remaining[i].position !== targetPos) {
+          const updated = await api.upsertPriority({
+            date: currentDate,
+            position: targetPos,
+            title: remaining[i].title,
+            isCompleted: remaining[i].isCompleted,
+            category: remaining[i].category || undefined,
+          });
+          reindexed.push(updated);
+        } else {
+          reindexed.push(remaining[i]);
+        }
+      }
       setDailyData((prev) =>
-        prev
-          ? {
-              ...prev,
-              priorities: prev.priorities.filter((item) => item.id !== id),
-            }
-          : prev
+        prev ? { ...prev, priorities: reindexed } : prev
       );
     } catch (err) {
       console.error(err);
@@ -340,6 +353,17 @@ export const App: React.FC = () => {
     const updated = await api.updateSettings(newSettings);
     setSettings(updated);
   };
+
+  // Language switch from the header: apply immediately and persist as default
+  const handleLanguageChange = useCallback(async (lang: 'en' | 'ar') => {
+    setAppLanguage(lang);
+    try {
+      const updated = await api.updateSettings({ language: lang });
+      setSettings(updated);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   // Notes state
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
@@ -520,11 +544,12 @@ export const App: React.FC = () => {
         currentDate={currentDate}
         onDateChange={setCurrentDate}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onLanguageChange={handleLanguageChange}
         activeSection={activeSection}
       />
 
       {/* Main Bound Agenda Book Spread */}
-      <main className="w-full flex-1 pt-18 sm:pt-20 flex flex-col items-center justify-start">
+      <main className="w-full flex-1 pt-16 sm:pt-20 flex flex-col items-center justify-start">
         <AgendaBookSpread
           activeSection={activeSection}
           onSelectSection={(sec) => {
