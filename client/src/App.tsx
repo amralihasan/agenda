@@ -343,8 +343,14 @@ export const App: React.FC = () => {
 
   // Weekly plan actions
   const handleSaveWeeklyPlan = async (weekStartDate: string, data: any) => {
-    await api.saveWeeklyPlan(weekStartDate, data);
-    loadWeeklyAgenda(currentDate);
+    const saved = await api.saveWeeklyPlan(weekStartDate, data);
+    // Merge the saved plan locally instead of re-fetching the whole week.
+    // Re-fetching on every keystroke used to reset the editor and the caret.
+    setWeeklyData((prev) =>
+      prev && prev.weekStartDate === weekStartDate
+        ? { ...prev, weeklyPlan: { ...prev.weeklyPlan, ...saved } }
+        : prev
+    );
   };
 
   // Notes actions

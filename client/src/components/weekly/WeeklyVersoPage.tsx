@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addWeeks, subWeeks } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
+import { Trash2 } from 'lucide-react';
 import { WeeklyAgendaResponse, WeeklyGoal, Task } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 
@@ -54,7 +55,7 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
         position: 3,
       },
     ];
-  }, [weeklyData]);
+  }, [weeklyData, isRtl]);
 
   const handlePrevWeek = () => {
     const prev = subWeeks(dateObj, 1);
@@ -73,7 +74,6 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
     );
     await onSaveWeeklyPlan(weeklyData.weekStartDate, {
       goals: JSON.stringify(updatedGoals),
-      notes: weeklyData.weeklyPlan?.notes || '',
     });
   };
 
@@ -88,10 +88,19 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
       const updatedGoals = [...goals, newGoal];
       await onSaveWeeklyPlan(weeklyData.weekStartDate, {
         goals: JSON.stringify(updatedGoals),
-        notes: weeklyData.weeklyPlan?.notes || '',
       });
       setNewGoalText('');
     }
+  };
+
+  const handleDeleteGoal = async (goalId: string) => {
+    if (!weeklyData) return;
+    const updatedGoals = goals
+      .filter((goal) => goal.id !== goalId)
+      .map((goal, index) => ({ ...goal, position: index + 1 }));
+    await onSaveWeeklyPlan(weeklyData.weekStartDate, {
+      goals: JSON.stringify(updatedGoals),
+    });
   };
 
   const days = weeklyData?.days || [];
@@ -172,6 +181,17 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
                 >
                   {goal.text}
                 </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteGoal(goal.id);
+                  }}
+                  className="p-1 mt-0.5 text-[#675d52]/60 hover:text-[#ba1a1a] hover:bg-[#fee2e2] rounded transition-colors shrink-0"
+                  title={t('weekly.deleteGoal')}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
             ))}
 

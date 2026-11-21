@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -31,20 +31,46 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
     weeklyData?.weeklyPlan?.noteType || 'text'
   );
 
+  // Only rehydrate when the displayed week changes. Saving the same week must
+  // not overwrite what the user is typing (which reset the caret to the start).
   useEffect(() => {
     if (weeklyData?.weeklyPlan?.notes !== undefined) {
       setWeeklyNotes(weeklyData.weeklyPlan.notes || '');
       setNoteType(weeklyData.weeklyPlan.noteType || 'text');
     }
-  }, [weeklyData]);
+  }, [weeklyData?.weekStartDate]);
 
-  const handleSaveNotesBlur = (newContent = weeklyNotes, newType = noteType) => {
-    if (!weeklyData) return;
+  const notesSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelPendingNotesSave = () => {
+    if (notesSaveTimerRef.current) {
+      clearTimeout(notesSaveTimerRef.current);
+      notesSaveTimerRef.current = null;
+    }
+  };
+
+  const saveNotesNow = (content: string, type: 'text' | 'code') => {
+    cancelPendingNotesSave();
+    if (!weeklyData?.weekStartDate) return;
     onSaveWeeklyPlan(weeklyData.weekStartDate, {
-      notes: newContent,
-      noteType: newType,
+      notes: content,
+      noteType: type,
     });
   };
+
+  const scheduleNotesSave = (content: string, type: 'text' | 'code') => {
+    cancelPendingNotesSave();
+    if (!weeklyData?.weekStartDate) return;
+    // Capture the week so a pending save still targets the right week if the
+    // user navigates away before the debounce fires.
+    const weekStartDate = weeklyData.weekStartDate;
+    notesSaveTimerRef.current = setTimeout(() => {
+      notesSaveTimerRef.current = null;
+      onSaveWeeklyPlan(weekStartDate, { notes: content, noteType: type });
+    }, 700);
+  };
+
+  useEffect(() => cancelPendingNotesSave, []);
 
   const days = weeklyData?.days || [];
   const rectoDays = days.slice(3, 7);
@@ -163,6 +189,7 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
                 targetType="weekly"
                 targetId={weeklyData.weekStartDate}
                 onTranscribeText={(text) => {
+                  cancelPendingNotesSave();
                   setWeeklyNotes((prev) => {
                     const updated = prev ? prev + ' ' + text : text;
                     onSaveWeeklyPlan(weeklyData.weekStartDate, { notes: updated });
@@ -182,12 +209,12 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
             content={weeklyNotes}
             onChange={(val) => {
               setWeeklyNotes(val);
-              handleSaveNotesBlur(val, noteType);
+              scheduleNotesSave(val, noteType);
             }}
             noteType={noteType}
             onNoteTypeChange={(type) => {
               setNoteType(type);
-              handleSaveNotesBlur(weeklyNotes, type);
+              saveNotesNow(weeklyNotes, type);
             }}
             paperStyle="ruled"
             rows={10}
