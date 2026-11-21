@@ -63,7 +63,16 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
   };
 
   const handleFinishEditPriority = (pos: number) => {
-    onSavePriority(pos, editingTitle.trim());
+    const trimmed = editingTitle.trim();
+    if (trimmed) {
+      onSavePriority(pos, trimmed);
+    } else {
+      // If cleared to empty and a priority exists, delete it
+      const existing = priorities.find((x) => x.position === pos);
+      if (existing && onDeletePriority) {
+        onDeletePriority(existing.id);
+      }
+    }
     setEditingPos(null);
   };
 
@@ -177,18 +186,33 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
               return (
                 <div
                   key={pos}
-                  className="flex items-baseline gap-2 group cursor-pointer py-0.5 hover:bg-[#f6f3ed]/60 px-1 rounded transition-colors"
+                  onClick={() => handleStartEditPriority(pos, title)}
+                  className="flex items-baseline gap-2 group cursor-text py-0.5 hover:bg-[#f6f3ed]/60 px-1 rounded transition-colors"
+                  title={title ? '' : t('daily.addPriorityPlaceholder')}
                 >
                   <span
-                    onClick={() => p && onTogglePriority(p)}
-                    className="font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 select-none mr-1"
+                    onClick={(e) => {
+                      if (p && title) {
+                        e.stopPropagation();
+                        onTogglePriority(p);
+                      }
+                    }}
+                    className={`font-label-mono text-xs text-[#832613] font-bold w-6 shrink-0 select-none mr-1 ${
+                      p && title ? 'cursor-pointer hover:scale-105 transition-transform' : ''
+                    }`}
+                    title={
+                      p && title
+                        ? isCompleted
+                          ? t('daily.completed')
+                          : t('daily.priority')
+                        : ''
+                    }
                   >
                     {roman}
                   </span>
 
                   <span
-                    onClick={() => p && onTogglePriority(p)}
-                    className={`flex-1 transition-all ${
+                    className={`flex-1 transition-all select-none ${
                       isCompleted
                         ? 'line-through decoration-[#832613]/70 decoration-1 text-[#675d52] italic'
                         : title
@@ -228,14 +252,20 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
 
                   {title && (
                     <span
-                      onClick={() => p && onTogglePriority(p)}
-                      className={`font-label-stamp text-[10px] uppercase tracking-wider shrink-0 select-none ${
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (p) onTogglePriority(p);
+                      }}
+                      className={`font-label-stamp text-[10px] uppercase tracking-wider shrink-0 select-none cursor-pointer hover:scale-105 transition-transform ${
                         isCompleted
                           ? 'text-[#832613]'
                           : p?.category === 'Urgent' || p?.category === 'عاجل'
                           ? 'text-[#832613]'
                           : 'text-[#675d52]'
                       }`}
+                      title={
+                        isCompleted ? t('daily.completed') : t('daily.priority')
+                      }
                     >
                       {isCompleted
                         ? t('daily.completed')
