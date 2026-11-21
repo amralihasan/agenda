@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   X,
@@ -38,6 +38,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Keep the form in sync with the persisted settings, so the selector always
+  // reflects the saved default language (and other preferences) when opened.
+  useEffect(() => {
+    setLanguage(settings.language || 'ar');
+    setFirstDayOfWeek(settings.firstDayOfWeek ?? 1);
+    setStartHour(settings.startHour ?? 6);
+    setEndHour(settings.endHour ?? 22);
+  }, [
+    isOpen,
+    settings.language,
+    settings.firstDayOfWeek,
+    settings.startHour,
+    settings.endHour,
+  ]);
 
   if (!isOpen) return null;
 

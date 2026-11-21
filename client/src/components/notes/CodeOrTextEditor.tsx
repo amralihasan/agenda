@@ -780,7 +780,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
         onClick={handleEditorClick}
         dangerouslySetInnerHTML={{ __html: formatContentAsHtml(content) }}
         data-placeholder={placeholder || t('daily.notesPlaceholder')}
-        className={`rich-note-editor w-full p-3 sm:p-4 focus:outline-none text-[#080c12] text-base font-body-script flex-1 overflow-y-auto ${
+        className={`rich-note-editor w-full px-3 sm:px-4 focus:outline-none text-[#080c12] text-base font-body-script flex-1 overflow-y-auto ${
           paperStyle === 'ruled'
             ? 'paper-notebook-lines'
             : paperStyle === 'grid'
