@@ -72,6 +72,133 @@
   background: rgba(103, 93, 82, 0.45);
 }
 
+/* Enforce strictly LTR monospace for Code Studio Terminal */
+.code-editor,
+.code-editor * {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', 'Courier New', monospace !important;
+  letter-spacing: normal !important;
+}
+
+/* Prism Syntax Highlighting Color Palette */
+.code-editor .token.comment,
+.code-editor .token.prolog,
+.code-editor .token.doctype,
+.code-editor .token.cdata {
+  color: #71717a !important;
+  font-style: italic !important;
+}
+.code-editor .token.punctuation {
+  color: #a1a1aa !important;
+}
+.code-editor .token.property,
+.code-editor .token.tag,
+.code-editor .token.boolean,
+.code-editor .token.number,
+.code-editor .token.constant,
+.code-editor .token.symbol {
+  color: #fb923c !important;
+}
+.code-editor .token.selector,
+.code-editor .token.attr-name,
+.code-editor .token.string,
+.code-editor .token.char,
+.code-editor .token.builtin {
+  color: #4ade80 !important;
+}
+.code-editor .token.operator,
+.code-editor .token.entity,
+.code-editor .token.url,
+.code-editor .token.variable,
+.code-editor .token.parameter {
+  color: #38bdf8 !important;
+}
+.code-editor .token.atrule,
+.code-editor .token.attr-value,
+.code-editor .token.keyword {
+  color: #c084fc !important;
+  font-weight: 600 !important;
+}
+.code-editor .token.function,
+.code-editor .token.class-name {
+  color: #60a5fa !important;
+}
+.code-editor .token.regex,
+.code-editor .token.important {
+  color: #fbbf24 !important;
+}
+
+/* Rich Text Formatting on Archival Ruled Paper */
+.rich-note-editor {
+  outline: none !important;
+  min-height: 220px;
+}
+.rich-note-editor h1 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #080c12;
+  margin: 0.5rem 0 0.25rem 0;
+  border-bottom: 1px solid rgba(131, 38, 19, 0.25);
+  padding-bottom: 0.15rem;
+}
+.rich-note-editor h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #832613;
+  margin: 0.4rem 0 0.2rem 0;
+}
+.rich-note-editor h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1c1c18;
+  margin: 0.3rem 0 0.15rem 0;
+}
+.rich-note-editor p {
+  margin: 0.2rem 0;
+}
+.rich-note-editor b,
+.rich-note-editor strong {
+  font-weight: 700;
+  color: #080c12;
+}
+.rich-note-editor i,
+.rich-note-editor em {
+  font-style: italic;
+}
+.rich-note-editor u {
+  text-decoration: underline;
+  text-decoration-color: #832613;
+  text-underline-offset: 3px;
+}
+.rich-note-editor s,
+.rich-note-editor strike,
+.rich-note-editor del {
+  text-decoration: line-through;
+  text-decoration-color: #832613;
+}
+.rich-note-editor mark {
+  background-color: #fef08a;
+  color: #713f12;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+.rich-note-editor blockquote {
+  border-inline-start: 3px solid #832613;
+  padding-inline-start: 12px;
+  margin: 6px 0;
+  font-style: italic;
+  color: #675d52;
+}
+.rich-note-editor ul {
+  list-style-type: disc;
+  margin-inline-start: 22px;
+}
+.rich-note-editor ol {
+  list-style-type: decimal;
+  margin-inline-start: 22px;
+}
+
 /* Notebook Ruled Lines (Real Notebook Paper Feel - Aligned with Text Baselines) */
 .paper-notebook-lines {
   background-color: transparent;
