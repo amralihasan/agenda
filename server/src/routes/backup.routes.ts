@@ -6,17 +6,27 @@ export const backupRouter = Router();
 // GET /api/backup/export
 backupRouter.get('/export', async (_req: Request, res: Response) => {
   try {
-    const [tasks, priorities, events, dailyNotes, notes, weeklyPlans, settings, categories] =
-      await Promise.all([
-        prisma.task.findMany(),
-        prisma.dailyPriority.findMany(),
-        prisma.scheduleEvent.findMany(),
-        prisma.dailyNote.findMany(),
-        prisma.note.findMany(),
-        prisma.weeklyPlan.findMany(),
-        prisma.appSettings.findMany(),
-        prisma.category.findMany(),
-      ]);
+    const [
+      tasks,
+      priorities,
+      events,
+      dailyNotes,
+      notes,
+      weeklyPlans,
+      monthlyPlans,
+      settings,
+      categories,
+    ] = await Promise.all([
+      prisma.task.findMany(),
+      prisma.dailyPriority.findMany(),
+      prisma.scheduleEvent.findMany(),
+      prisma.dailyNote.findMany(),
+      prisma.note.findMany(),
+      prisma.weeklyPlan.findMany(),
+      prisma.monthlyPlan.findMany(),
+      prisma.appSettings.findMany(),
+      prisma.category.findMany(),
+    ]);
 
     const backupData = {
       version: 1,
@@ -27,6 +37,7 @@ backupRouter.get('/export', async (_req: Request, res: Response) => {
       dailyNotes,
       notes,
       weeklyPlans,
+      monthlyPlans,
       settings,
       categories,
     };
@@ -58,6 +69,7 @@ backupRouter.post('/import', async (req: Request, res: Response) => {
       await tx.dailyNote.deleteMany({});
       await tx.note.deleteMany({});
       await tx.weeklyPlan.deleteMany({});
+      await tx.monthlyPlan.deleteMany({});
 
       // Restore data
       if (data.categories?.length) {
@@ -104,6 +116,12 @@ backupRouter.post('/import', async (req: Request, res: Response) => {
       if (data.weeklyPlans?.length) {
         for (const wp of data.weeklyPlans) {
           await tx.weeklyPlan.create({ data: wp });
+        }
+      }
+
+      if (data.monthlyPlans?.length) {
+        for (const mp of data.monthlyPlans) {
+          await tx.monthlyPlan.create({ data: mp });
         }
       }
     });

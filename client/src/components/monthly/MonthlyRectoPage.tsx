@@ -1,27 +1,55 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { addDays, format, parseISO, startOfWeek } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { MonthlyAgendaResponse, MonthlyDaySummary } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 
 interface MonthlyRectoPageProps {
   currentDate: string;
   monthlyData: MonthlyAgendaResponse | null;
+  onDateChange: (date: string) => void;
   onOpenDayAgenda: (date: string) => void;
+  firstDayOfWeek: number;
 }
 
 export const MonthlyRectoPage: React.FC<MonthlyRectoPageProps> = ({
   currentDate,
   monthlyData,
+  onDateChange,
   onOpenDayAgenda,
+  firstDayOfWeek,
 }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
 
-  const days = monthlyData?.days || [];
-  const partTwoDays = days.filter((d) => {
-    const dayNum = parseInt(d.date.slice(8, 10), 10);
-    return dayNum > 15;
+  const dateObj = parseISO(currentDate);
+  const year = monthlyData?.year ?? dateObj.getFullYear();
+  const month = monthlyData?.month ?? dateObj.getMonth() + 1;
+  const monthDate = new Date(year, month - 1, 1);
+  const weekStartsOn = (firstDayOfWeek ?? 1) as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+  const monthYearLabel = format(monthDate, 'MMMM yyyy', {
+    locale: isRtl ? ar : enUS,
   });
+
+  const weekStart = startOfWeek(monthDate, { weekStartsOn });
+  const weekdayLabels = Array.from({ length: 7 }, (_, index) =>
+    format(addDays(weekStart, index), 'EEE', { locale: isRtl ? ar : enUS })
+  );
+  const leadingBlanks = (monthDate.getDay() - weekStartsOn + 7) % 7;
+
+  const days = monthlyData?.days || [];
+
+  const handlePrevMonth = () => {
+    const prev = new Date(year, month - 2, 1);
+    onDateChange(format(prev, 'yyyy-MM-01'));
+  };
+
+  const handleNextMonth = () => {
+    const next = new Date(year, month, 1);
+    onDateChange(format(next, 'yyyy-MM-01'));
+  };
 
   const renderDayCell = (day: MonthlyDaySummary) => {
     const dayNum = parseInt(day.date.slice(8, 10), 10);
@@ -32,7 +60,7 @@ export const MonthlyRectoPage: React.FC<MonthlyRectoPageProps> = ({
       <div
         key={day.date}
         onClick={() => onOpenDayAgenda(day.date)}
-        className={`min-h-[58px] sm:min-h-[68px] p-1.5 sm:p-2 bg-[#fcf9f3] hover:bg-[#f6f3ed] cursor-pointer transition-colors relative flex flex-col justify-between border border-[#e5e2dc]/60 ${
+        className={`min-h-[72px] sm:min-h-[80px] p-1.5 bg-[#fcf9f3] hover:bg-[#f6f3ed] cursor-pointer transition-colors relative flex flex-col justify-between border border-[#e5e2dc]/60 ${
           isSelected ? 'ring-1 ring-[#832613] bg-[#f6f3ed]' : ''
         }`}
       >
@@ -95,64 +123,58 @@ export const MonthlyRectoPage: React.FC<MonthlyRectoPageProps> = ({
         <header className="flex flex-col gap-1.5 pb-3 border-b border-[#e5e2dc]">
           <div className="flex items-center justify-between font-label-mono text-xs text-[#675d52] tracking-wider uppercase">
             <span>{isRtl ? 'صحيفة ٧٥ · وجه الصحيفة' : 'Folio 75 · Recto'}</span>
-            <span className="tracking-widest font-bold text-[#080c12]">{isRtl ? 'رقم ١٤٧' : 'N° 147'}</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrevMonth}
+                className="hover:text-[#832613] px-1 transition-colors"
+                title={isRtl ? 'الشهر السابق' : 'Previous month'}
+              >
+                {isRtl ? '→' : '←'}
+              </button>
+              <span className="tracking-widest font-bold text-[#080c12] text-sm">
+                {monthYearLabel}
+              </span>
+              <button
+                onClick={handleNextMonth}
+                className="hover:text-[#832613] px-1 transition-colors"
+                title={isRtl ? 'الشهر التالي' : 'Next month'}
+              >
+                {isRtl ? '←' : '→'}
+              </button>
+            </div>
+            <span className="tracking-widest font-bold text-[#080c12]">
+              {isRtl ? 'رقم ١٤٧' : 'N° 147'}
+            </span>
           </div>
+
           <div className="flex items-baseline justify-between mt-1">
             <span className="font-caption-caps text-caption-caps text-[#832613] tracking-widest uppercase font-semibold">
-              {t('monthly.partTwo')}
+              {t('monthly.fullCalendar')}
             </span>
             <span className="font-label-mono text-[10px] text-[#675d52]">
-              {isRtl ? 'الأسابيع ٤٢–٤٤' : 'Hebdomas 42–44'}
+              {isRtl ? 'التقويم السنوي · السجل الشهري' : 'Annum · Liber Menstruus'}
             </span>
           </div>
         </header>
 
-        {/* Section: Calendar Grid Part II (Days 16+) */}
+        {/* Full month calendar grid */}
         <section className="mt-3">
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
-            {partTwoDays.map(renderDayCell)}
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {weekdayLabels.map((label) => (
+              <span
+                key={label}
+                className="text-center font-label-stamp text-[10px] uppercase tracking-wider text-[#675d52] py-0.5"
+              >
+                {label}
+              </span>
+            ))}
           </div>
-        </section>
 
-        {/* Section: Memoranda & Epistolary Register */}
-        <section className="mt-5 pt-3 border-t border-[#e5e2dc] p-3 rounded-sm min-h-[180px] bg-[#fdfbf7]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-caption-caps text-caption-caps text-[#832613] uppercase tracking-widest font-semibold">
-              {t('monthly.memorandaTitle')}
-            </span>
-            <span className="font-label-stamp text-[9px] text-[#675d52] opacity-70">
-              {isRtl ? 'أكتوبر ٢٥' : 'OCTOBER \'25'}
-            </span>
-          </div>
-          <div className="space-y-2 font-body-script text-sm text-[#080c12] leading-[24px]">
-            {isRtl ? (
-              <>
-                <p>
-                  <span className="font-medium text-[#832613]">• إرسال:</span> شحنة عينات الجلود الأرشيفية المجلدة إلى المشاغل التخصصية.
-                </p>
-                <p>
-                  <span className="font-medium text-[#832613]">• تدقيق:</span> مراجعة محاذاة العلامات المائية على ورق المخطوطات الفاخر.
-                </p>
-                <p className="italic text-[#675d52]">
-                  «يبقى السجل حياً ما دامت كل ضربة قلم تُقدّر وقار اليوم دون تعجل.»
-                </p>
-              </>
-            ) : (
-              <>
-                <p>
-                  <span className="font-medium text-[#832613]">• Dispatch:</span> Consignment
-                  of archival morocco leather samples shipped to Brussels binderies.
-                </p>
-                <p>
-                  <span className="font-medium text-[#832613]">• Verification:</span> Verify
-                  register watermark alignment on 1928 French laid paper reams.
-                </p>
-                <p className="italic text-[#675d52]">
-                  “A ledger remains living so long as each stroke of ink honors the day's
-                  unhurried weight.”
-                </p>
-              </>
-            )}
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: leadingBlanks }, (_, index) => (
+              <div key={`blank-${index}`} className="min-h-[72px] sm:min-h-[80px]" />
+            ))}
+            {days.map(renderDayCell)}
           </div>
         </section>
       </div>

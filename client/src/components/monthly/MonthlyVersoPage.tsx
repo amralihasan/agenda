@@ -1,22 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
-import { MonthlyAgendaResponse, MonthlyDaySummary } from '../../types';
+import { Check, Edit3, Plus, Trash2, X } from 'lucide-react';
+import {
+  MonthlyAgendaResponse,
+  MonthlyIntention,
+  MonthlyMemo,
+} from '../../types';
 import { PageFooter } from '../book/PageFooter';
 
 interface MonthlyVersoPageProps {
   currentDate: string;
   monthlyData: MonthlyAgendaResponse | null;
   onDateChange: (date: string) => void;
-  onOpenDayAgenda: (date: string) => void;
+  onSaveMonthlyPlan: (data: { intentions?: string; notes?: string }) => Promise<void>;
 }
+
+const parseList = <T,>(raw: string | null | undefined, fallback: T[]): T[] => {
+  try {
+    const parsed = JSON.parse(raw || '[]');
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const arabicDigits = (value: number) =>
+  String(value).replace(/\d/g, (digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)]);
+
+const ROMAN: [number, string][] = [
+  [1000, 'M'],
+  [900, 'CM'],
+  [500, 'D'],
+  [400, 'CD'],
+  [100, 'C'],
+  [90, 'XC'],
+  [50, 'L'],
+  [40, 'XL'],
+  [10, 'X'],
+  [9, 'IX'],
+  [5, 'V'],
+  [4, 'IV'],
+  [1, 'I'],
+];
+
+const toRoman = (value: number) => {
+  let remaining = value;
+  let result = '';
+  for (const [amount, numeral] of ROMAN) {
+    while (remaining >= amount) {
+      result += numeral;
+      remaining -= amount;
+    }
+  }
+  return result || 'I';
+};
+
+const makeId = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
   currentDate,
   monthlyData,
   onDateChange,
-  onOpenDayAgenda,
+  onSaveMonthlyPlan,
 }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
@@ -24,73 +74,40 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
   const year = dateObj.getFullYear();
   const month = dateObj.getMonth() + 1;
 
-  const defaultIntentions = isRtl
-    ? [
-        {
-          id: '1',
-          numeral: '١.',
-          text: 'إنجاز المخطوطة الأرشيفية ودراسة فصول السجل الاستراتيجي.',
-          isCompleted: true,
-        },
-        {
-          id: '2',
-          numeral: '٢.',
-          text: 'معرض الخط والطباعة: اقتناء ورق قطني معتق وعينات جلد فاخرة.',
-          isCompleted: false,
-        },
-        {
-          id: '3',
-          numeral: '٣.',
-          text: 'إعادة تهيئة مشغل التجليد: ضبط أوزان المكبس الحديدي والألواح.',
-          isCompleted: false,
-        },
-        {
-          id: '4',
-          numeral: '٤.',
-          text: 'التدقيق الأرشيفي: فهرسة الوثائق والمراسلات المحفوظة بالأختام.',
-          isCompleted: false,
-        },
-      ]
-    : [
-        {
-          id: '1',
-          numeral: 'I.',
-          text: 'Complete first draft: Smythson Archive Monograph chapters 4 through 7.',
-          isCompleted: true,
-        },
-        {
-          id: '2',
-          numeral: 'II.',
-          text: 'Paris Bibliophile Salon: Acquire hand-marbled endpapers and goat vellum samples.',
-          isCompleted: false,
-        },
-        {
-          id: '3',
-          numeral: 'III.',
-          text: 'Bookbinding Studio Refit: Cast iron nipping press installation & platen calibration.',
-          isCompleted: false,
-        },
-        {
-          id: '4',
-          numeral: 'IV.',
-          text: 'Archival Inventory Audit: Catalog watermarked rag stock (1910–1940 mill batches).',
-          isCompleted: false,
-        },
-      ];
+  const [intentions, setIntentions] = useState<MonthlyIntention[]>([]);
+  const [memos, setMemos] = useState<MonthlyMemo[]>([]);
 
-  const [intentions, setIntentions] = useState(defaultIntentions);
+  const [isAddingIntention, setIsAddingIntention] = useState(false);
+  const [newIntentionText, setNewIntentionText] = useState('');
+  const [editingIntentionId, setEditingIntentionId] = useState<string | null>(null);
+  const [editingIntentionText, setEditingIntentionText] = useState('');
 
-  React.useEffect(() => {
-    setIntentions(defaultIntentions);
-  }, [isRtl]);
+  const [isAddingMemo, setIsAddingMemo] = useState(false);
+  const [newMemoText, setNewMemoText] = useState('');
+  const [editingMemoId, setEditingMemoId] = useState<string | null>(null);
+  const [editingMemoText, setEditingMemoText] = useState('');
 
-  const toggleIntention = (id: string) => {
-    setIntentions((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
-      )
-    );
-  };
+  // Rehydrate only when the displayed month changes; saving must not overwrite
+  // whatever the user is currently typing.
+  useEffect(() => {
+    setIntentions(parseList<MonthlyIntention>(monthlyData?.monthlyPlan?.intentions, []));
+    setMemos(parseList<MonthlyMemo>(monthlyData?.monthlyPlan?.notes, []));
+    setIsAddingIntention(false);
+    setNewIntentionText('');
+    setEditingIntentionId(null);
+    setEditingIntentionText('');
+    setIsAddingMemo(false);
+    setNewMemoText('');
+    setEditingMemoId(null);
+    setEditingMemoText('');
+  }, [monthlyData?.year, monthlyData?.month]);
+
+  const numeral = (position: number) =>
+    isRtl ? `${arabicDigits(position)}.` : `${toRoman(position)}.`;
+
+  const monthYearLabel = format(dateObj, 'MMMM yyyy', {
+    locale: isRtl ? ar : enUS,
+  });
 
   const handlePrevMonth = () => {
     let newYear = year;
@@ -99,8 +116,7 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
       newMonth = 12;
       newYear -= 1;
     }
-    const newDateStr = `${newYear}-${newMonth.toString().padStart(2, '0')}-01`;
-    onDateChange(newDateStr);
+    onDateChange(`${newYear}-${newMonth.toString().padStart(2, '0')}-01`);
   };
 
   const handleNextMonth = () => {
@@ -110,83 +126,81 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
       newMonth = 1;
       newYear += 1;
     }
-    const newDateStr = `${newYear}-${newMonth.toString().padStart(2, '0')}-01`;
-    onDateChange(newDateStr);
+    onDateChange(`${newYear}-${newMonth.toString().padStart(2, '0')}-01`);
   };
 
-  const days = monthlyData?.days || [];
-  const partOneDays = days.filter((d) => {
-    const dayNum = parseInt(d.date.slice(8, 10), 10);
-    return dayNum <= 15;
-  });
+  const persistIntentions = (next: MonthlyIntention[]) => {
+    setIntentions(next);
+    onSaveMonthlyPlan({ intentions: JSON.stringify(next) });
+  };
 
-  const monthYearLabel = format(dateObj, 'MMMM yyyy', {
-    locale: isRtl ? ar : enUS,
-  });
+  const persistMemos = (next: MonthlyMemo[]) => {
+    setMemos(next);
+    onSaveMonthlyPlan({ notes: JSON.stringify(next) });
+  };
 
-  const renderDayCell = (day: MonthlyDaySummary) => {
-    const dayNum = parseInt(day.date.slice(8, 10), 10);
-    const hasActivity = day.totalTasks > 0 || day.totalEvents > 0 || day.hasNote;
-    const isSelected = day.date === currentDate;
-
-    return (
-      <div
-        key={day.date}
-        onClick={() => onOpenDayAgenda(day.date)}
-        className={`min-h-[58px] sm:min-h-[68px] p-1.5 sm:p-2 bg-[#fcf9f3] hover:bg-[#f6f3ed] cursor-pointer transition-colors relative flex flex-col justify-between border border-[#e5e2dc]/60 ${
-          isSelected ? 'ring-1 ring-[#832613] bg-[#f6f3ed]' : ''
-        }`}
-      >
-        <div className="flex items-start justify-between">
-          <span
-            className={`font-label-mono text-xs font-semibold ${
-              isSelected ? 'text-[#832613] font-bold' : 'text-[#080c12]'
-            }`}
-          >
-            {dayNum}
-          </span>
-
-          {hasActivity && (
-            <div className="flex items-center gap-1">
-              {day.totalEvents > 0 && (
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[#832613]"
-                  title={`${day.totalEvents} appointments`}
-                ></span>
-              )}
-              {day.totalTasks > 0 && (
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[#2d5a46]"
-                  title={`${day.totalTasks} tasks`}
-                ></span>
-              )}
-              {day.hasNote && (
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[#c5a059]"
-                  title="Folio Notes written"
-                ></span>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="mt-1 space-y-0.5 overflow-hidden">
-          {day.events.slice(0, 1).map((ev) => (
-            <p
-              key={ev.id}
-              className="font-body-script text-[11px] text-[#080c12] truncate leading-tight"
-            >
-              • {ev.title}
-            </p>
-          ))}
-          {day.totalTasks > 0 && (
-            <span className="font-label-stamp text-[9px] text-[#675d52] block">
-              {day.completedTasks}/{day.totalTasks} {t('daily.completed')}
-            </span>
-          )}
-        </div>
-      </div>
+  const toggleIntention = (id: string) => {
+    persistIntentions(
+      intentions.map((item) =>
+        item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+      )
     );
+  };
+
+  const addIntention = () => {
+    const text = newIntentionText.trim();
+    if (!text) return;
+    persistIntentions([
+      ...intentions,
+      {
+        id: makeId(),
+        text,
+        isCompleted: false,
+        position: intentions.length + 1,
+      },
+    ]);
+    setNewIntentionText('');
+    setIsAddingIntention(false);
+  };
+
+  const saveIntentionEdit = (id: string) => {
+    const text = editingIntentionText.trim();
+    if (!text) return;
+    persistIntentions(
+      intentions.map((item) => (item.id === id ? { ...item, text } : item))
+    );
+    setEditingIntentionId(null);
+    setEditingIntentionText('');
+  };
+
+  const deleteIntention = (id: string) => {
+    persistIntentions(
+      intentions
+        .filter((item) => item.id !== id)
+        .map((item, index) => ({ ...item, position: index + 1 }))
+    );
+  };
+
+  const addMemo = () => {
+    const text = newMemoText.trim();
+    if (!text) return;
+    persistMemos([...memos, { id: makeId(), text }]);
+    setNewMemoText('');
+    setIsAddingMemo(false);
+  };
+
+  const saveMemoEdit = (id: string) => {
+    const text = editingMemoText.trim();
+    if (!text) return;
+    persistMemos(
+      memos.map((memo) => (memo.id === id ? { ...memo, text } : memo))
+    );
+    setEditingMemoId(null);
+    setEditingMemoText('');
+  };
+
+  const deleteMemo = (id: string) => {
+    persistMemos(memos.filter((memo) => memo.id !== id));
   };
 
   return (
@@ -200,6 +214,7 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
               <button
                 onClick={handlePrevMonth}
                 className="hover:text-[#832613] px-1 transition-colors"
+                title={isRtl ? 'الشهر السابق' : 'Previous month'}
               >
                 {isRtl ? '→' : '←'}
               </button>
@@ -209,11 +224,14 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
               <button
                 onClick={handleNextMonth}
                 className="hover:text-[#832613] px-1 transition-colors"
+                title={isRtl ? 'الشهر التالي' : 'Next month'}
               >
                 {isRtl ? '←' : '→'}
               </button>
             </div>
-            <span className="tracking-widest font-bold text-[#080c12]">{isRtl ? 'رقم ١٤٦' : 'N° 146'}</span>
+            <span className="tracking-widest font-bold text-[#080c12]">
+              {isRtl ? 'رقم ١٤٦' : 'N° 146'}
+            </span>
           </div>
 
           <div className="flex items-baseline justify-between mt-1">
@@ -244,17 +262,62 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
           </div>
 
           <div className="space-y-1.5 font-body-md text-sm text-[#080c12]">
-            {intentions.map((item) => (
-              <div key={item.id} className="flex items-start gap-2 group py-0.5">
-                <span className="font-headline-sm text-sm text-[#832613] w-5 select-none shrink-0 font-serif">
-                  {item.numeral}
-                </span>
-                <div
-                  onClick={() => toggleIntention(item.id)}
-                  className="flex-1 cursor-pointer"
-                >
+            {intentions.map((item, index) => {
+              if (editingIntentionId === item.id) {
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2 py-1 px-1.5 rounded bg-[#f6f3ed] border border-[#832613]/40"
+                  >
+                    <span className="font-headline-sm text-sm text-[#832613] w-5 select-none shrink-0 font-serif">
+                      {numeral(index + 1)}
+                    </span>
+                    <input
+                      type="text"
+                      value={editingIntentionText}
+                      onChange={(e) => setEditingIntentionText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveIntentionEdit(item.id);
+                        if (e.key === 'Escape') setEditingIntentionId(null);
+                      }}
+                      onFocus={(e) =>
+                        e.currentTarget.setSelectionRange(
+                          e.currentTarget.value.length,
+                          e.currentTarget.value.length
+                        )
+                      }
+                      autoFocus
+                      className="flex-1 bg-transparent border-b border-[#832613]/30 pb-0.5 text-sm focus:outline-none"
+                      placeholder={t('monthly.addIntentionPlaceholder')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => saveIntentionEdit(item.id)}
+                      className="p-1 text-[#16a34a] hover:bg-white rounded"
+                      title={isRtl ? 'حفظ' : 'Save'}
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingIntentionId(null)}
+                      className="p-1 text-[#675d52] hover:bg-white rounded"
+                      title={isRtl ? 'إلغاء' : 'Cancel'}
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={item.id} className="flex items-start gap-2 group py-0.5">
+                  <span className="font-headline-sm text-sm text-[#832613] w-5 select-none shrink-0 font-serif">
+                    {numeral(index + 1)}
+                  </span>
                   <p
-                    className={`leading-tight ${
+                    onClick={() => toggleIntention(item.id)}
+                    className={`flex-1 leading-tight cursor-pointer ${
                       item.isCompleted
                         ? 'line-through text-[#675d52] italic'
                         : 'text-[#080c12]'
@@ -262,41 +325,231 @@ export const MonthlyVersoPage: React.FC<MonthlyVersoPageProps> = ({
                   >
                     {item.text}
                   </p>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingIntentionId(item.id);
+                        setEditingIntentionText(item.text);
+                      }}
+                      className="p-1 text-[#675d52]/60 hover:text-[#832613] hover:bg-[#e5e2dc]/60 rounded transition-colors"
+                      title={t('monthly.editIntention')}
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteIntention(item.id)}
+                      className="p-1 text-[#675d52]/60 hover:text-[#ba1a1a] hover:bg-[#fee2e2] rounded transition-colors"
+                      title={t('monthly.deleteIntention')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleIntention(item.id)}
+                      className={`ml-1 mt-0.5 w-3.5 h-3.5 border flex items-center justify-center transition-colors text-[9px] ${
+                        item.isCompleted
+                          ? 'bg-[#080c12] text-[#fcf9f3] border-[#080c12]'
+                          : 'bg-[#f0eee8] border-[#76777c]/40 hover:border-[#080c12]'
+                      }`}
+                      title={
+                        item.isCompleted
+                          ? isRtl
+                            ? 'تحديد كغير منجز'
+                            : 'Mark incomplete'
+                          : isRtl
+                          ? 'تحديد كمنجز'
+                          : 'Mark completed'
+                      }
+                    >
+                      {item.isCompleted && '✓'}
+                    </button>
+                  </div>
                 </div>
+              );
+            })}
+
+            {isAddingIntention ? (
+              <div className="flex items-center gap-2 py-1 px-1.5 rounded bg-[#f6f3ed] border border-[#832613]/40">
+                <span className="font-headline-sm text-sm text-[#832613] w-5 select-none shrink-0 font-serif">
+                  {numeral(intentions.length + 1)}
+                </span>
+                <input
+                  type="text"
+                  value={newIntentionText}
+                  onChange={(e) => setNewIntentionText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') addIntention();
+                    if (e.key === 'Escape') setIsAddingIntention(false);
+                  }}
+                  autoFocus
+                  className="flex-1 bg-transparent border-b border-[#832613]/30 pb-0.5 text-sm focus:outline-none"
+                  placeholder={t('monthly.addIntentionPlaceholder')}
+                />
                 <button
                   type="button"
-                  onClick={() => toggleIntention(item.id)}
-                  className={`shrink-0 mt-0.5 w-3.5 h-3.5 border flex items-center justify-center transition-colors text-[9px] ${
-                    item.isCompleted
-                      ? 'bg-[#080c12] text-[#fcf9f3] border-[#080c12]'
-                      : 'bg-[#f0eee8] border-[#76777c]/40 hover:border-[#080c12]'
-                  }`}
+                  onClick={addIntention}
+                  className="p-1 text-[#16a34a] hover:bg-white rounded"
+                  title={isRtl ? 'حفظ' : 'Save'}
                 >
-                  {item.isCompleted && '✓'}
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingIntention(false)}
+                  className="p-1 text-[#675d52] hover:bg-white rounded"
+                  title={isRtl ? 'إلغاء' : 'Cancel'}
+                >
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
-            ))}
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAddingIntention(true)}
+                className="flex items-center gap-1.5 text-[11px] font-label-stamp uppercase tracking-wider text-[#832613] px-2.5 py-1 rounded border border-dashed border-[#832613]/40 bg-[#fdfbf7] hover:bg-[#832613] hover:text-white transition-all cursor-pointer"
+              >
+                <Plus className="w-3 h-3" />
+                <span>{t('monthly.addIntention')}</span>
+              </button>
+            )}
           </div>
         </section>
 
-        {/* Section 2: Letterpress Calendar Grid Part I (Days 1 to 15) */}
-        <section className="mt-3">
-          <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-[#e5e2dc]">
-            <span className="font-caption-caps text-caption-caps tracking-widest text-[#080c12] uppercase font-semibold">
-              {t('monthly.partOne')}
-            </span>
-            <span className="font-label-mono text-[10px] text-[#675d52]">
-              {isRtl ? 'الأسابيع ٤٠–٤٢' : 'Hebdomas 40–42'}
+        {/* Section 2: Notes & Memoranda */}
+        <section className="mt-4 pt-3 border-t border-[#e5e2dc]">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-caption-caps text-caption-caps text-[#832613] tracking-widest uppercase font-bold">
+              {t('monthly.memorandaTitle')}
+            </h2>
+            <span className="font-label-stamp text-[9px] text-[#675d52] opacity-70">
+              {monthYearLabel}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
-            {partOneDays.map(renderDayCell)}
+          <div className="space-y-2 font-body-script text-sm text-[#080c12]">
+            {memos.map((memo) => {
+              if (editingMemoId === memo.id) {
+                return (
+                  <div
+                    key={memo.id}
+                    className="p-1.5 rounded border border-[#832613]/40 bg-[#f6f3ed]"
+                  >
+                    <textarea
+                      value={editingMemoText}
+                      onChange={(e) => setEditingMemoText(e.target.value)}
+                      onFocus={(e) =>
+                        e.currentTarget.setSelectionRange(
+                          e.currentTarget.value.length,
+                          e.currentTarget.value.length
+                        )
+                      }
+                      autoFocus
+                      rows={2}
+                      className="w-full bg-transparent text-sm leading-[24px] focus:outline-none resize-none"
+                    />
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => saveMemoEdit(memo.id)}
+                        className="p-1 text-[#16a34a] hover:bg-white rounded"
+                        title={isRtl ? 'حفظ' : 'Save'}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingMemoId(null)}
+                        className="p-1 text-[#675d52] hover:bg-white rounded"
+                        title={isRtl ? 'إلغاء' : 'Cancel'}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={memo.id} className="flex items-start gap-2 group">
+                  <span className="text-[#832613] font-medium shrink-0">•</span>
+                  <p className="flex-1 leading-[24px] whitespace-pre-wrap">
+                    {memo.text}
+                  </p>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingMemoId(memo.id);
+                        setEditingMemoText(memo.text);
+                      }}
+                      className="p-1 text-[#675d52]/60 hover:text-[#832613] hover:bg-[#e5e2dc]/60 rounded transition-colors"
+                      title={t('monthly.editMemo')}
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteMemo(memo.id)}
+                      className="p-1 text-[#675d52]/60 hover:text-[#ba1a1a] hover:bg-[#fee2e2] rounded transition-colors"
+                      title={t('monthly.deleteMemo')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {isAddingMemo ? (
+              <div className="p-1.5 rounded border border-[#832613]/40 bg-[#f6f3ed]">
+                <textarea
+                  value={newMemoText}
+                  onChange={(e) => setNewMemoText(e.target.value)}
+                  autoFocus
+                  rows={2}
+                  className="w-full bg-transparent text-sm leading-[24px] focus:outline-none resize-none"
+                  placeholder={t('monthly.memoPlaceholder')}
+                />
+                <div className="flex items-center justify-end gap-1">
+                  <button
+                    type="button"
+                    onClick={addMemo}
+                    className="p-1 text-[#16a34a] hover:bg-white rounded"
+                    title={isRtl ? 'حفظ' : 'Save'}
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingMemo(false)}
+                    className="p-1 text-[#675d52] hover:bg-white rounded"
+                    title={isRtl ? 'إلغاء' : 'Cancel'}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAddingMemo(true)}
+                className="flex items-center gap-1.5 text-[11px] font-label-stamp uppercase tracking-wider text-[#832613] px-2.5 py-1 rounded border border-dashed border-[#832613]/40 bg-[#fdfbf7] hover:bg-[#832613] hover:text-white transition-all cursor-pointer"
+              >
+                <Plus className="w-3 h-3" />
+                <span>{t('monthly.addMemo')}</span>
+              </button>
+            )}
           </div>
         </section>
       </div>
 
-      <PageFooter side="left" pageNumber={146} subText={isRtl ? 'القسم الأول · السجل الشهري' : 'Pars Prima · Liber Menstruus'} />
+      <PageFooter
+        side="left"
+        pageNumber={146}
+        subText={isRtl ? 'القسم الأول · السجل الشهري' : 'Pars Prima · Liber Menstruus'}
+      />
     </div>
   );
 };

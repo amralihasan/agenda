@@ -146,9 +146,30 @@ export interface MonthlyDaySummary {
   hasNote: boolean;
 }
 
+export interface MonthlyIntention {
+  id: string;
+  text: string;
+  isCompleted: boolean;
+  position: number;
+}
+
+export interface MonthlyMemo {
+  id: string;
+  text: string;
+}
+
+export interface MonthlyPlan {
+  id?: string;
+  year: number;
+  month: number;
+  intentions: string; // JSON string of MonthlyIntention[]
+  notes: string; // JSON string of MonthlyMemo[]
+}
+
 export interface MonthlyAgendaResponse {
   year: number;
   month: number;
   monthName: string;
   days: MonthlyDaySummary[];
+  monthlyPlan: MonthlyPlan;
 }

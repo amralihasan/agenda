@@ -56,6 +56,11 @@ export const WeeklyPlanUpsertSchema = z.object({
   noteType: z.enum(['text', 'code']).default('text').optional(),
 });
 
+export const MonthlyPlanUpdateSchema = z.object({
+  intentions: z.string().optional(),
+  notes: z.string().optional(),
+});
+
 export const NoteCreateSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   content: z.string().default(''),

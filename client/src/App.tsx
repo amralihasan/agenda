@@ -353,6 +353,20 @@ export const App: React.FC = () => {
     );
   };
 
+  // Monthly plan actions (intentions + memoranda)
+  const handleSaveMonthlyPlan = async (data: {
+    intentions?: string;
+    notes?: string;
+  }) => {
+    const d = parseISO(currentDate);
+    const year = monthlyData?.year ?? d.getFullYear();
+    const month = monthlyData?.month ?? d.getMonth() + 1;
+    const saved = await api.saveMonthlyPlan(year, month, data);
+    setMonthlyData((prev) =>
+      prev ? { ...prev, monthlyPlan: { ...prev.monthlyPlan, ...saved } } : prev
+    );
+  };
+
   // Notes actions
   const handleCreateNote = async (data: Partial<Note>) => {
     notesMutationIdRef.current += 1;
@@ -506,14 +520,16 @@ export const App: React.FC = () => {
         currentDate={currentDate}
         monthlyData={monthlyData}
         onDateChange={setCurrentDate}
-        onOpenDayAgenda={handleOpenDayAgenda}
+        onSaveMonthlyPlan={handleSaveMonthlyPlan}
       />
     );
     rightPageContent = (
       <MonthlyRectoPage
         currentDate={currentDate}
         monthlyData={monthlyData}
+        onDateChange={setCurrentDate}
         onOpenDayAgenda={handleOpenDayAgenda}
+        firstDayOfWeek={settings.firstDayOfWeek}
       />
     );
   } else if (activeSection === 'notes') {

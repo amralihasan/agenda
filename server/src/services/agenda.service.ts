@@ -135,7 +135,7 @@ export class AgendaService {
       format(d, 'yyyy-MM-dd')
     );
 
-    const [tasks, events, notes] = await Promise.all([
+    const [tasks, events, notes, monthlyPlan] = await Promise.all([
       prisma.task.findMany({
         where: {
           date: { in: daysInMonth },
@@ -154,6 +154,9 @@ export class AgendaService {
           content: { not: '' },
         },
         select: { id: true, date: true },
+      }),
+      prisma.monthlyPlan.findUnique({
+        where: { year_month: { year, month } },
       }),
     ]);
 
@@ -177,6 +180,13 @@ export class AgendaService {
       month,
       monthName: format(monthStart, 'MMMM'),
       days: daySummaries,
+      monthlyPlan:
+        monthlyPlan || {
+          year,
+          month,
+          intentions: '[]',
+          notes: '[]',
+        },
     };
   }
 

@@ -140,6 +140,17 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // Monthly Plan
+  saveMonthlyPlan: (
+    year: number,
+    month: number,
+    data: { intentions?: string; notes?: string }
+  ) =>
+    fetchJson<import('../types').MonthlyPlan>(`/monthly-plan/${year}/${month}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
   // Settings
   getSettings: () => fetchJson<AppSettings>('/settings'),
   updateSettings: (data: Partial<AppSettings>) =>
