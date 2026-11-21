@@ -161,6 +161,22 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleDeletePriority = async (id: string) => {
+    try {
+      await api.deletePriority(id);
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              priorities: prev.priorities.filter((item) => item.id !== id),
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // Task actions
   const handleToggleTask = async (task: Task) => {
     try {
@@ -391,6 +407,7 @@ export const App: React.FC = () => {
         onDateChange={setCurrentDate}
         onTogglePriority={handleTogglePriority}
         onSavePriority={handleSavePriority}
+        onDeletePriority={handleDeletePriority}
         onAddEventClick={handleAddEventClick}
         onEditEventClick={handleEditEventClick}
       />

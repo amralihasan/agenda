@@ -73,6 +73,10 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+  deletePriority: (id: string) =>
+    fetchJson<{ success: boolean; id: string }>(`/priorities/${id}`, {
+      method: 'DELETE',
+    }),
 
   // Schedule Events
   createEvent: (data: Partial<ScheduleEvent>) =>

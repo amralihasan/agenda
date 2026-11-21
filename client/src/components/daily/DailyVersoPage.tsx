@@ -17,6 +17,7 @@ interface DailyVersoPageProps {
   onDateChange: (date: string) => void;
   onTogglePriority: (priority: DailyPriority) => void;
   onSavePriority: (pos: number, title: string) => void;
+  onDeletePriority?: (id: string) => void;
   onAddEventClick: (hour: string) => void;
   onEditEventClick: (event: ScheduleEvent) => void;
 }
@@ -32,6 +33,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
   onDateChange,
   onTogglePriority,
   onSavePriority,
+  onDeletePriority,
   onAddEventClick,
   onEditEventClick,
 }) => {
@@ -197,14 +199,31 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                     {title || t('daily.addPriorityPlaceholder')}
                   </span>
 
-                  <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleStartEditPriority(pos, title)}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartEditPriority(pos, title);
+                      }}
                       className="p-1 hover:text-[#832613] text-[#675d52]"
                       title={t('daily.editPriority')}
                     >
                       <Edit3 className="w-3 h-3" />
                     </button>
+                    {p && onDeletePriority && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeletePriority(p.id);
+                        }}
+                        className="p-1 hover:text-[#ba1a1a] text-[#675d52]"
+                        title={t('daily.deletePriority')}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
 
                   {title && (
@@ -223,7 +242,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                         : p?.category && p.category.trim() !== ''
                         ? (p.category === 'Urgent' || p.category === 'عاجل'
                             ? t('daily.urgent')
-                            : p.category === 'Complété' || p.category === 'Completed' || p.category === 'مُنجز'
+                            : p.category === 'Complété' || p.category === 'Completed' || p.category === 'مُنجز' || p.category === 'تم'
                             ? t('daily.completed')
                             : p.category.toLowerCase() === 'priorité' || p.category.toLowerCase() === 'priority'
                             ? t('daily.priority')

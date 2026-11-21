@@ -40,6 +40,7 @@
     "priority": "Priority",
     "urgent": "Urgent",
     "editPriority": "Edit Priority",
+    "deletePriority": "Delete Priority",
     "migrated": "Deferred",
     "moveToTomorrow": "Move to Tomorrow",
     "moveToDate": "Move to Date...",
