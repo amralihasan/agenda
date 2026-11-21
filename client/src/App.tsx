@@ -1,0 +1,523 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { format, parseISO } from 'date-fns';
+import { HeaderBanner } from './components/book/HeaderBanner';
+import { AgendaBookSpread } from './components/book/AgendaBookSpread';
+import { AgendaSection } from './components/book/IndexTabs';
+import { DailyVersoPage } from './components/daily/DailyVersoPage';
+import { DailyRectoPage } from './components/daily/DailyRectoPage';
+import { EventDialog } from './components/daily/EventDialog';
+import { MoveTaskDialog } from './components/daily/MoveTaskDialog';
+import { WeeklyVersoPage } from './components/weekly/WeeklyVersoPage';
+import { WeeklyRectoPage } from './components/weekly/WeeklyRectoPage';
+import { MonthlyVersoPage } from './components/monthly/MonthlyVersoPage';
+import { MonthlyRectoPage } from './components/monthly/MonthlyRectoPage';
+import { NotesVersoPage } from './components/notes/NotesVersoPage';
+import { NotesRectoPage } from './components/notes/NotesRectoPage';
+import { SettingsModal } from './components/settings/SettingsModal';
+import { api } from './services/api';
+import {
+  DailyAgendaResponse,
+  WeeklyAgendaResponse,
+  MonthlyAgendaResponse,
+  Task,
+  DailyPriority,
+  ScheduleEvent,
+  Note,
+  AppSettings,
+} from './types';
+import { setAppLanguage } from './i18n/i18n';
+
+export const App: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
+  // Current selected date (defaults to today's date)
+  const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
+  const [activeSection, setActiveSection] = useState<AgendaSection>('daily');
+
+  // Server state
+  const [dailyData, setDailyData] = useState<DailyAgendaResponse | null>(null);
+  const [weeklyData, setWeeklyData] = useState<WeeklyAgendaResponse | null>(null);
+  const [monthlyData, setMonthlyData] = useState<MonthlyAgendaResponse | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [settings, setSettings] = useState<AppSettings>({
+    id: 'default',
+    language: 'ar',
+    firstDayOfWeek: 1,
+    startHour: 6,
+    endHour: 22,
+    paperTone: 'ivory',
+  });
+
+  // Dialog states
+  const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [activeEventForDialog, setActiveEventForDialog] = useState<Partial<ScheduleEvent> | null>(null);
+  const [isMoveTaskDialogOpen, setIsMoveTaskDialogOpen] = useState(false);
+  const [taskToMove, setTaskToMove] = useState<Task | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Initial load: settings & notes
+  useEffect(() => {
+    api.getSettings().then((s) => {
+      setSettings(s);
+      const targetLang = s.language || 'ar';
+      if (targetLang !== i18n.language) {
+        setAppLanguage(targetLang);
+      }
+    }).catch(console.error);
+
+    api.getNotes().then(setNotes).catch(console.error);
+  }, []);
+
+  // Fetch daily agenda whenever date changes
+  const loadDailyAgenda = useCallback(async (dateStr: string) => {
+    try {
+      const data = await api.getDailyAgenda(dateStr);
+      setDailyData(data);
+    } catch (err) {
+      console.error('Failed to load daily agenda:', err);
+    }
+  }, []);
+
+  // Fetch weekly agenda
+  const loadWeeklyAgenda = useCallback(async (dateStr: string) => {
+    try {
+      const data = await api.getWeeklyAgenda(dateStr);
+      setWeeklyData(data);
+    } catch (err) {
+      console.error('Failed to load weekly agenda:', err);
+    }
+  }, []);
+
+  // Fetch monthly agenda
+  const loadMonthlyAgenda = useCallback(async (dateStr: string) => {
+    try {
+      const d = parseISO(dateStr);
+      const data = await api.getMonthlyAgenda(d.getFullYear(), d.getMonth() + 1);
+      setMonthlyData(data);
+    } catch (err) {
+      console.error('Failed to load monthly agenda:', err);
+    }
+  }, []);
+
+  // Trigger loads based on activeSection and currentDate
+  useEffect(() => {
+    loadDailyAgenda(currentDate);
+
+    if (activeSection === 'weekly') {
+      loadWeeklyAgenda(currentDate);
+    } else if (activeSection === 'monthly') {
+      loadMonthlyAgenda(currentDate);
+    } else if (activeSection === 'notes') {
+      api.getNotes().then(setNotes).catch(console.error);
+    }
+  }, [currentDate, activeSection, loadDailyAgenda, loadWeeklyAgenda, loadMonthlyAgenda]);
+
+  // Priority actions
+  const handleTogglePriority = async (p: DailyPriority) => {
+    try {
+      const updated = await api.updatePriority(p.id, { isCompleted: !p.isCompleted });
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              priorities: prev.priorities.map((item) =>
+                item.position === p.position ? updated : item
+              ),
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSavePriority = async (position: number, title: string) => {
+    try {
+      const saved = await api.upsertPriority({
+        date: currentDate,
+        position,
+        title,
+        isCompleted: false,
+      });
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              priorities: prev.priorities.map((item) =>
+                item.position === position ? saved : item
+              ),
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Task actions
+  const handleToggleTask = async (task: Task) => {
+    try {
+      const nextCompleted = !task.isCompleted;
+      const updated = await api.updateTask(task.id, {
+        isCompleted: nextCompleted,
+        status: nextCompleted ? 'completed' : 'pending',
+      });
+
+      // Update dailyData state
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              tasks: prev.tasks.map((t) => (t.id === task.id ? updated : t)),
+            }
+          : prev
+      );
+
+      // If weekly is loaded, refresh it too
+      if (weeklyData) {
+        setWeeklyData((prev) =>
+          prev
+            ? {
+                ...prev,
+                days: prev.days.map((day) => ({
+                  ...day,
+                  tasks: day.tasks.map((t) => (t.id === task.id ? updated : t)),
+                })),
+              }
+            : prev
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddTask = async (title: string) => {
+    try {
+      const newTask = await api.createTask({
+        title,
+        date: currentDate,
+        priority: 'normal',
+        isCompleted: false,
+      });
+
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              tasks: [...prev.tasks, newTask],
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    try {
+      await api.deleteTask(id);
+      setDailyData((prev) =>
+        prev
+          ? {
+              ...prev,
+              tasks: prev.tasks.filter((t) => t.id !== id),
+            }
+          : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOpenMoveTaskDialog = (task: Task) => {
+    setTaskToMove(task);
+    setIsMoveTaskDialogOpen(true);
+  };
+
+  const handleConfirmMoveTask = async (taskId: string, targetDate: string) => {
+    try {
+      await api.moveTask(taskId, targetDate);
+      loadDailyAgenda(currentDate);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Daily note action
+  const handleSaveDailyNote = async (content: string) => {
+    try {
+      const updated = await api.saveDailyNote(currentDate, { content });
+      setDailyData((prev) =>
+        prev ? { ...prev, dailyNote: updated } : prev
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Schedule event actions
+  const handleAddEventClick = (hour: string) => {
+    const endH = parseInt(hour.slice(0, 2), 10) + 1;
+    const endStr = `${endH.toString().padStart(2, '0')}:00`;
+    setActiveEventForDialog({
+      startTime: hour,
+      endTime: endStr,
+      date: currentDate,
+      title: '',
+    });
+    setIsEventDialogOpen(true);
+  };
+
+  const handleEditEventClick = (event: ScheduleEvent) => {
+    setActiveEventForDialog(event);
+    setIsEventDialogOpen(true);
+  };
+
+  const handleSaveEvent = async (eventData: Partial<ScheduleEvent>) => {
+    if (eventData.id) {
+      await api.updateEvent(eventData.id, eventData);
+    } else {
+      await api.createEvent(eventData);
+    }
+    loadDailyAgenda(currentDate);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    await api.deleteEvent(id);
+    loadDailyAgenda(currentDate);
+  };
+
+  // Weekly plan actions
+  const handleSaveWeeklyPlan = async (weekStartDate: string, data: any) => {
+    await api.saveWeeklyPlan(weekStartDate, data);
+    loadWeeklyAgenda(currentDate);
+  };
+
+  // Notes actions
+  const handleCreateNote = async (data: Partial<Note>) => {
+    const newNote = await api.createNote(data);
+    setNotes((prev) => [newNote, ...prev]);
+    return newNote;
+  };
+
+  const handleUpdateNote = async (id: string, data: Partial<Note>) => {
+    const updated = await api.updateNote(id, data);
+    setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    await api.deleteNote(id);
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  // Settings update
+  const handleUpdateSettings = async (newSettings: Partial<AppSettings>) => {
+    const updated = await api.updateSettings(newSettings);
+    setSettings(updated);
+  };
+
+  // Notes state
+  const [notesSearchQuery, setNotesSearchQuery] = useState('');
+  const [notesCategory, setNotesCategory] = useState('All');
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const notesCategories = ['All', 'Philosophy', 'Architecture', 'Archive', 'Editorial', 'Personal'];
+
+  const handleCreateNewNoteQuick = async () => {
+    const newNote = await handleCreateNote({
+      title: isRtl
+        ? `صحيفة غير معنونة · صحيفة ${notes.length + 1}`
+        : `Untitled Inscription · Folio ${notes.length + 1}`,
+      content: '',
+      category: notesCategory === 'All' ? 'General' : notesCategory,
+      paperStyle: 'ruled',
+      date: format(new Date(), 'yyyy-MM-dd'),
+    });
+    setSelectedNoteId(newNote.id);
+  };
+
+  const handleOpenDayAgenda = (dateStr: string) => {
+    setCurrentDate(dateStr);
+    setActiveSection('daily');
+  };
+
+  // Render content according to active section
+  let leftPageContent: React.ReactNode = null;
+  let rightPageContent: React.ReactNode = null;
+
+  if (activeSection === 'daily') {
+    leftPageContent = (
+      <DailyVersoPage
+        date={currentDate}
+        dayOfYear={dailyData?.dayOfYear || 288}
+        totalDays={dailyData?.totalDays || 365}
+        priorities={dailyData?.priorities || []}
+        events={dailyData?.events || []}
+        startHour={settings.startHour}
+        endHour={settings.endHour}
+        onDateChange={setCurrentDate}
+        onTogglePriority={handleTogglePriority}
+        onSavePriority={handleSavePriority}
+        onAddEventClick={handleAddEventClick}
+        onEditEventClick={handleEditEventClick}
+      />
+    );
+
+    rightPageContent = (
+      <DailyRectoPage
+        date={currentDate}
+        tasks={dailyData?.tasks || []}
+        dailyNote={
+          dailyData?.dailyNote || {
+            id: `note-${currentDate}`,
+            date: currentDate,
+            content: '',
+          }
+        }
+        weekNumber={dailyData?.weekNumber || 42}
+        dayOfYear={dailyData?.dayOfYear || 288}
+        onToggleTask={handleToggleTask}
+        onAddTask={handleAddTask}
+        onDeleteTask={handleDeleteTask}
+        onMoveTaskClick={handleOpenMoveTaskDialog}
+        onSaveDailyNote={handleSaveDailyNote}
+      />
+    );
+  } else if (activeSection === 'weekly') {
+    leftPageContent = (
+      <WeeklyVersoPage
+        currentDate={currentDate}
+        weeklyData={weeklyData}
+        onDateChange={setCurrentDate}
+        onOpenDayAgenda={handleOpenDayAgenda}
+        onSaveWeeklyPlan={handleSaveWeeklyPlan}
+        onToggleTask={handleToggleTask}
+      />
+    );
+    rightPageContent = (
+      <WeeklyRectoPage
+        weeklyData={weeklyData}
+        onOpenDayAgenda={handleOpenDayAgenda}
+        onSaveWeeklyPlan={handleSaveWeeklyPlan}
+        onToggleTask={handleToggleTask}
+      />
+    );
+  } else if (activeSection === 'monthly') {
+    leftPageContent = (
+      <MonthlyVersoPage
+        currentDate={currentDate}
+        monthlyData={monthlyData}
+        onDateChange={setCurrentDate}
+        onOpenDayAgenda={handleOpenDayAgenda}
+      />
+    );
+    rightPageContent = (
+      <MonthlyRectoPage
+        currentDate={currentDate}
+        monthlyData={monthlyData}
+        onOpenDayAgenda={handleOpenDayAgenda}
+      />
+    );
+  } else if (activeSection === 'notes') {
+    const activeNote = notes.find((n) => n.id === selectedNoteId) || notes[0] || null;
+
+    leftPageContent = (
+      <NotesVersoPage
+        notes={notes}
+        selectedNoteId={selectedNoteId || notes[0]?.id || null}
+        searchQuery={notesSearchQuery}
+        selectedCategory={notesCategory}
+        categories={notesCategories}
+        onSelectNote={setSelectedNoteId}
+        onSearchChange={setNotesSearchQuery}
+        onCategoryChange={setNotesCategory}
+        onCreateNewNote={handleCreateNewNoteQuick}
+        onTogglePin={async (note, e) => {
+          e.stopPropagation();
+          await handleUpdateNote(note.id, { isPinned: !note.isPinned });
+        }}
+        onDeleteNote={async (noteId, e) => {
+          e.stopPropagation();
+          await handleDeleteNote(noteId);
+          if (selectedNoteId === noteId) {
+            const remaining = notes.filter((n) => n.id !== noteId);
+            setSelectedNoteId(remaining[0]?.id || null);
+          }
+        }}
+      />
+    );
+    rightPageContent = (
+      <NotesRectoPage
+        activeNote={activeNote}
+        categories={notesCategories}
+        onUpdateNote={handleUpdateNote}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-burgundy-900 text-on-surface flex flex-col justify-between selection:bg-secondary-container selection:text-on-secondary-fixed">
+      {/* Top Banner & Header */}
+      <HeaderBanner
+        currentDate={currentDate}
+        onDateChange={setCurrentDate}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        activeSection={activeSection}
+      />
+
+      {/* Main Bound Agenda Book Spread */}
+      <main className="w-full flex-1 pt-18 sm:pt-20 flex flex-col items-center justify-start">
+        <AgendaBookSpread
+          activeSection={activeSection}
+          onSelectSection={setActiveSection}
+          leftPage={leftPageContent}
+          rightPage={rightPageContent}
+        />
+      </main>
+
+      {/* Bottom Desk Strip */}
+      <footer className="w-full py-3 bg-[#130202] text-[#868992] border-t border-[#380a08]/60 text-center font-label-mono text-[11px] select-none">
+        <div className="max-w-[1360px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>{t('app.bookbinding')}</span>
+          <div className="flex items-center gap-4 text-[#da664d]/80 uppercase tracking-widest text-[10px]">
+            <span>{t('app.title')}</span>
+            <span>·</span>
+            <span>{t('app.subtitle')}</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Appointment / Event Dialog */}
+      <EventDialog
+        isOpen={isEventDialogOpen}
+        onClose={() => setIsEventDialogOpen(false)}
+        onSave={handleSaveEvent}
+        onDelete={handleDeleteEvent}
+        initialEvent={activeEventForDialog}
+        defaultDate={currentDate}
+      />
+
+      {/* Move Task to Another Date Dialog */}
+      <MoveTaskDialog
+        isOpen={isMoveTaskDialogOpen}
+        task={taskToMove}
+        onClose={() => setIsMoveTaskDialogOpen(false)}
+        onConfirmMove={handleConfirmMoveTask}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        settings={settings}
+        onClose={() => setIsSettingsOpen(false)}
+        onUpdateSettings={handleUpdateSettings}
+        onDataRestored={() => {
+          loadDailyAgenda(currentDate);
+          api.getNotes().then(setNotes);
+        }}
+      />
+    </div>
+  );
+};

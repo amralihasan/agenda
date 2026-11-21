@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"error-container":"#ffdad6","primary-fixed-dim":"#c3c6d0","inverse-primary":"#c3c6d0","surface-container-low":"#f6f3ed","on-secondary":"#ffffff","on-primary-container":"#868992","on-background":"#1c1c18","surface-variant":"#e5e2dc","surface-tint":"#5b5e67","outline":"#76777c","on-surface-variant":"#45474b","on-primary-fixed":"#181c23","inverse-on-surface":"#f3f0ea","on-primary":"#ffffff","secondary":"#675d52","surface-container-high":"#ebe8e2","secondary-fixed-dim":"#d2c4b7","surface-container":"#f0eee8","on-error":"#ffffff","primary-fixed":"#dfe2ec","on-error-container":"#93000a","background":"#fcf9f3","on-secondary-container":"#6b6156","on-secondary-fixed-variant":"#4f453c","secondary-fixed":"#efe0d3","surface-container-lowest":"#ffffff","on-tertiary-fixed":"#3e0500","surface-bright":"#fcf9f3","on-primary-fixed-variant":"#43474f","on-tertiary":"#ffffff","outline-variant":"#c6c6cb","inverse-surface":"#31312d","surface-container-highest":"#e5e2dc","on-secondary-fixed":"#221a12","on-tertiary-container":"#da664d","surface-dim":"#dcdad4","tertiary":"#200200","on-tertiary-fixed-variant":"#832613","secondary-container":"#ecddd0","tertiary-fixed-dim":"#ffb4a4","on-surface":"#1c1c18","primary":"#080c12","tertiary-fixed":"#ffdad3","tertiary-container":"#490800","surface":"#fcf9f3","error":"#ba1a1a","primary-container":"#1e2229"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"3.5rem","gutter":"1.5rem","space-sm":"0.5rem","space-md":"1rem","space-xl":"2.5rem","gutter-desktop":"3rem","margin-tablet":"2rem","margin":"1rem","space-xs":"0.25rem","space-lg":"1.5rem"},"fontFamily":{"headline-lg-mobile":["EB Garamond"],"body-sm":["Newsreader"],"label-stamp":["Courier Prime"],"headline-xl":["EB Garamond"],"headline-xl-mobile":["EB Garamond"],"body-lg":["Newsreader"],"body-script":["Newsreader"],"label-mono":["Courier Prime"],"title-editorial":["EB Garamond"],"caption-caps":["EB Garamond"],"headline-lg":["EB Garamond"],"headline-sm":["EB Garamond"],"body-md":["Newsreader"],"headline-md":["EB Garamond"]},"fontSize":{"headline-lg-mobile":["22px",{"lineHeight":"30px","letterSpacing":"0.02em","fontWeight":"500"}],"body-sm":["13px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"400"}],"label-stamp":["11px",{"lineHeight":"14px","letterSpacing":"0.14em","fontWeight":"700"}],"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"0.04em","fontWeight":"400"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"0.03em","fontWeight":"400"}],"body-lg":["17px",{"lineHeight":"28px","letterSpacing":"0em","fontWeight":"400"}],"body-script":["16px",{"lineHeight":"26px","letterSpacing":"0.01em","fontWeight":"400"}],"label-mono":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"400"}],"title-editorial":["20px",{"lineHeight":"28px","letterSpacing":"0.08em","fontWeight":"400"}],"caption-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.18em","fontWeight":"600"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0.01em","fontWeight":"600"}],"body-md":["15px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"0.02em","fontWeight":"600"}]}}}}</script></head><body class="bg-tertiary text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-secondary-container selection:text-on-secondary-container"><header class="fixed top-0 left-0 w-full z-50 bg-tertiary/90 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-16 max-w-7xl mx-auto px-margin md:px-margin-desktop flex items-center justify-between"><div class="flex items-center gap-space-sm"><span class="font-title-editorial text-title-editorial text-secondary-fixed tracking-wider uppercase">L'Édition Manuscrite</span><span class="hidden sm:inline-block font-label-stamp text-label-stamp px-space-xs py-0.5 rounded bg-tertiary-container text-on-tertiary-container tracking-widest uppercase">Exécutif</span></div><div class="flex items-center gap-space-md text-secondary-fixed"><button class="text-body-sm font-body-sm text-secondary-fixed-dim hover:text-secondary-fixed transition-colors flex items-center gap-1" type="button"><span class="material-symbols-outlined text-[16px]">west</span><span class="hidden md:inline">Pagina Anterior</span></button><span class="font-headline-sm text-headline-sm text-secondary-fixed tracking-wide px-space-xs text-center">Mercredi, 15 Octobre 2025</span><button class="text-body-sm font-body-sm text-secondary-fixed-dim hover:text-secondary-fixed transition-colors flex items-center gap-1" type="button"><span class="hidden md:inline">Pagina Sequens</span><span class="material-symbols-outlined text-[16px]">east</span></button></div><div class="flex items-center gap-space-md"><button class="font-label-mono text-label-mono px-space-sm py-1 rounded bg-tertiary-container text-secondary-fixed hover:bg-tertiary-container/80 transition-colors uppercase tracking-widest" type="button">EN / عربي</button><button class="text-secondary-fixed-dim hover:text-secondary-fixed transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[20px]">bookmark</span></button><button class="text-secondary-fixed-dim hover:text-secondary-fixed transition-colors flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[20px]">search</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 flex-1 bg-tertiary relative overflow-hidden"><div class="max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-lg relative flex items-start justify-center"><div class="w-full relative flex"><div class="flex-1 relative"><div class="flex flex-col w-full">
+<!-- Folio Book Spread Viewport -->
+<div class="w-full relative py-space-sm md:py-space-md select-text">
+<!-- Mobile Folio Switcher (Hidden on Desktop/Tablet) -->
+<div class="flex md:hidden items-center justify-between bg-surface-container-high px-space-md py-space-sm rounded-lg mb-space-md shadow-sm">
+<span class="font-label-stamp text-label-stamp tracking-widest text-on-surface-variant uppercase">Affichage Folio</span>
+<div class="inline-flex p-0.5 bg-surface-container-highest rounded">
+<button class="px-space-md py-1 text-label-stamp font-label-stamp tracking-wider rounded bg-surface text-on-surface shadow-sm transition-all uppercase" id="tab-verso-btn" onclick="toggleMobilePage('verso')" type="button">Verso (Folio 76)</button>
+<button class="px-space-md py-1 text-label-stamp font-label-stamp tracking-wider rounded text-on-surface-variant hover:text-on-surface transition-all uppercase" id="tab-recto-btn" onclick="toggleMobilePage('recto')" type="button">Recto (Folio 77)</button>
+</div>
+</div>
+<!-- The Dual-Page Smyth-Sewn Volume Container -->
+<div class="relative w-full max-w-[1320px] mx-auto rounded-lg shadow-[0_4px_14px_rgba(10,8,6,0.55),0_28px_60px_-10px_rgba(8,6,4,0.85)] flex flex-col md:flex-row overflow-visible">
+<!-- Silk Ribbon Marker (Draping Down Gutter) -->
+<div class="hidden md:block absolute left-1/2 -top-4 -translate-x-1/2 z-40 pointer-events-none drop-shadow-[0_8px_10px_rgba(0,0,0,0.45)]">
+<div class="w-4 h-[720px] bg-gradient-to-r from-tertiary-container via-on-tertiary-container to-tertiary-container rounded-t-sm relative shadow-inner">
+<div class="absolute bottom-0 left-0 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[12px] border-b-tertiary"></div>
+</div>
+</div>
+<!-- ============================================================== -->
+<!-- VERSO PAGE (LEFT - FOLIO 76: MEMORANDA & THOUGHTS)             -->
+<!-- ============================================================== -->
+<div class="w-full md:w-1/2 bg-surface text-on-surface rounded-l-lg p-space-md sm:p-space-lg md:p-space-xl relative flex flex-col justify-between min-h-[820px] shadow-[inset_-24px_0_36px_-18px_rgba(32,2,0,0.18)]" id="folio-verso">
+<!-- Subtle Vintage Ruled Lines Pattern Overlay for Left Page -->
+<div class="absolute inset-0 pointer-events-none rounded-l-lg opacity-40 bg-[linear-gradient(to_bottom,transparent_23px,#e5dec9_24px)] bg-[size:100%_24px]"></div>
+<!-- French Notebook Carmine Margin Line -->
+<div class="absolute top-0 bottom-0 left-10 md:left-14 w-px bg-tertiary-container/30 pointer-events-none"></div>
+<div class="relative z-10 pl-6 sm:pl-8 md:pl-10">
+<!-- Folio Header Strip -->
+<div class="flex items-center justify-between pb-space-sm mb-space-md text-on-surface-variant">
+<span class="font-label-stamp text-label-stamp tracking-[0.2em] text-secondary uppercase">Folio 76 · Liber Persona</span>
+<span class="font-caption-caps text-caption-caps tracking-[0.25em] text-on-surface font-semibold uppercase">Memoranda &amp; Thoughts</span>
+<span class="font-label-stamp text-label-stamp tracking-[0.2em] text-secondary uppercase">Vol. IV</span>
+</div>
+<!-- Chapter Header & Debossed Wax Seal Accent -->
+<div class="flex items-start justify-between gap-space-md mt-space-xs mb-space-lg">
+<div>
+<div class="inline-block px-space-xs py-0.5 mb-1 bg-surface-container text-secondary font-label-mono text-label-mono uppercase tracking-widest rounded-sm">
+                Inscribed: 15 October 2025
+              </div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight font-normal leading-tight">
+                Chapter XIII · Autumnal Ledger
+              </h1>
+<p class="font-body-sm text-body-sm text-secondary italic mt-0.5">
+                Reflections &amp; Working Drafts in Natural Umber
+              </p>
+</div>
+<!-- Red Letterpress Seal Stamp -->
+<div class="shrink-0 w-11 h-11 rounded-full bg-surface-container flex items-center justify-center text-tertiary-container shadow-[inset_0_1px_3px_rgba(73,8,0,0.3)]">
+<span class="material-symbols-outlined text-[22px]">history_edu</span>
+</div>
+</div>
+<!-- Editorial Ruled Manuscript Body (Contenteditable) -->
+<div class="space-y-space-md text-on-surface font-body-lg text-body-lg leading-[24px]">
+<!-- Highlighted Philosophical Quotation -->
+<blockquote class="bg-surface-container-low/75 p-space-md rounded-sm shadow-sm relative">
+<span class="font-headline-xl text-headline-xl text-secondary-container absolute -top-3 -left-1 select-none pointer-events-none font-serif">“</span>
+<p class="font-body-script text-body-script italic text-primary leading-[24px] pl-space-xs" contenteditable="true" spellcheck="false">
+                “The vitality of any stone carving resides in its subtle rejection of mechanical precision. When the chisel hesitates, humanity enters the masonry.”
+              </p>
+<div class="text-right mt-1">
+<span class="font-caption-caps text-caption-caps text-secondary uppercase tracking-widest">— Carnet d’un Tailleur de Pierre, 1842</span>
+</div>
+</blockquote>
+<!-- Journaling Prose Passages -->
+<div class="space-y-space-sm pt-space-xs">
+<p class="leading-[24px] text-justify text-on-surface" contenteditable="true" spellcheck="false">
+                Walking past the old stone cloister at dusk; the rain had saturated the limestone to a deep slate grey. Noticed how the shadow cast by the archway softened before extinguishing completely into the evening fog. In such liminal daylight, form abandons rigid geometry and yields directly to texture.
+              </p>
+<p class="leading-[24px] text-justify text-on-surface" contenteditable="true" spellcheck="false">
+                Observed an intriguing quality in our freshly sized vellum leaves: the rag paper absorbs iron-gall strokes without feathery bleeding, preserving the hairline upstrokes of the nib cleanly. There is immense sanctuary in this measured friction between pen and paper.
+              </p>
+</div>
+<!-- Marginal Citation Note Box -->
+<div class="mt-space-md p-space-sm bg-surface-container-low rounded text-on-surface-variant">
+<div class="flex items-center gap-space-xs mb-1 text-secondary">
+<span class="material-symbols-outlined text-[15px]">auto_stories</span>
+<span class="font-label-stamp text-label-stamp tracking-wider uppercase">Ex-Libris Citation</span>
+</div>
+<p class="font-body-sm text-body-sm italic leading-[20px]" contenteditable="true" spellcheck="false">
+                Consider the binding of the 1782 folio: pigskin over oak boards, blind-tooled fillet along the perimeter. The paper retains its crisp snap despite two centuries of alpine humidity. We must request equivalent rag stock from the Fabriano mills.
+              </p>
+</div>
+<!-- In-line Quick Note Draft -->
+<div class="pt-space-xs">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-label-stamp text-label-stamp text-tertiary-container uppercase">Draft Title:</span>
+<span class="font-body-md text-body-md font-medium text-primary underline decoration-secondary-container decoration-1 underline-offset-4" contenteditable="true">
+                  The Architecture of Measured Stillness. Studies in Timber &amp; Vellum.
+                </span>
+</div>
+</div>
+<!-- Interactive Prompt for Additional Transcriptions -->
+<div class="pt-space-sm flex items-center gap-space-sm text-secondary-fixed-variant group cursor-text">
+<span class="material-symbols-outlined text-[16px] text-secondary group-hover:text-primary transition-colors">edit_note</span>
+<span class="font-body-sm text-body-sm italic text-secondary hover:text-primary transition-colors" contenteditable="true" data-placeholder="Click to transcribe additional reflections or marginalia...">
+                Click to transcribe additional reflections or marginalia...
+              </span>
+</div>
+</div>
+</div>
+<!-- Verso Footer Note & Folio Index -->
+<div class="relative z-10 pt-space-lg flex items-center justify-between text-secondary pl-6 sm:pl-8 md:pl-10">
+<span class="font-label-stamp text-label-stamp tracking-widest uppercase">Acid-Free 120 GSM Chamois Vellum</span>
+<span class="font-label-stamp text-label-stamp font-bold tracking-widest uppercase">Folio 76</span>
+</div>
+<!-- Binding Gutter Shadow (Right side of left page) -->
+<div class="hidden md:block absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/15 to-transparent pointer-events-none"></div>
+</div>
+<!-- ============================================================== -->
+<!-- RECTO PAGE (RIGHT - FOLIO 77: IDEAS, PROJECTS & CORRESPONDENCE) -->
+<!-- ============================================================== -->
+<div class="w-full md:w-1/2 bg-surface text-on-surface rounded-r-lg p-space-md sm:p-space-lg md:p-space-xl relative flex flex-col justify-between min-h-[820px] shadow-[inset_24px_0_36px_-18px_rgba(32,2,0,0.18)]" id="folio-recto">
+<!-- 5mm Archival Dot Grid Pattern Background Overlay -->
+<div class="absolute inset-0 pointer-events-none rounded-r-lg opacity-35 bg-[radial-gradient(#ab9f8c_1.2px,transparent_1.2px)] bg-[size:18px_18px]"></div>
+<!-- Spine Crease Shadow (Left side of right page) -->
+<div class="hidden md:block absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/15 to-transparent pointer-events-none"></div>
+<div class="relative z-10 pr-2 sm:pr-4">
+<!-- Folio Header Strip -->
+<div class="flex items-center justify-between pb-space-sm mb-space-md text-on-surface-variant">
+<span class="font-label-stamp text-label-stamp tracking-[0.2em] text-secondary uppercase">Archivum · N° 148</span>
+<span class="font-caption-caps text-caption-caps tracking-[0.25em] text-on-surface font-semibold uppercase">Ideas, Projects &amp; Correspondence</span>
+<span class="font-label-stamp text-label-stamp tracking-[0.2em] text-secondary uppercase">Register 2025</span>
+</div>
+<!-- Section 1: Project Ideation & Cabinet Concepts -->
+<div class="mb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-caption-caps text-caption-caps tracking-widest text-primary font-bold uppercase">
+                  Project Ideation &amp; Concepts
+                </h2>
+</div>
+<span class="font-label-stamp text-label-stamp text-secondary uppercase tracking-wider">Concept Ref: 25-OCT-B</span>
+</div>
+<!-- Unboxed Specification Detail Card -->
+<div class="bg-surface-container-low p-space-md rounded-md shadow-sm space-y-space-xs">
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+<span class="font-headline-sm text-headline-sm text-primary font-normal">The Apothecary Herbarium Cabinet</span>
+<span class="font-label-stamp text-label-stamp text-on-tertiary-container bg-tertiary-container/15 px-space-xs py-0.5 rounded tracking-widest uppercase">Status: Prototyping</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary-fixed-variant leading-relaxed" contenteditable="true" spellcheck="false">
+                Modular 24-drawer cabinetry designed specifically to house pressed dried specimens, botanical folios, and specimen indexing slips in acid-free envelopes.
+              </p>
+<!-- Technical Specifications Grid -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs pt-space-xs text-center font-label-mono text-label-mono">
+<div class="bg-surface p-space-xs rounded shadow-sm">
+<div class="text-[10px] text-secondary uppercase tracking-wider">Height</div>
+<div class="font-bold text-on-surface" contenteditable="true">1,120 mm</div>
+</div>
+<div class="bg-surface p-space-xs rounded shadow-sm">
+<div class="text-[10px] text-secondary uppercase tracking-wider">Width</div>
+<div class="font-bold text-on-surface" contenteditable="true">680 mm</div>
+</div>
+<div class="bg-surface p-space-xs rounded shadow-sm">
+<div class="text-[10px] text-secondary uppercase tracking-wider">Timber</div>
+<div class="font-bold text-on-surface" contenteditable="true">White Oak</div>
+</div>
+<div class="bg-surface p-space-xs rounded shadow-sm">
+<div class="text-[10px] text-secondary uppercase tracking-wider">Fittings</div>
+<div class="font-bold text-on-surface" contenteditable="true">Cast Brass</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Pending Correspondence & Epistles -->
+<div class="mb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h2 class="font-caption-caps text-caption-caps tracking-widest text-primary font-bold uppercase">
+                  Pending Correspondence &amp; Epistles
+                </h2>
+</div>
+<span class="font-label-stamp text-label-stamp text-secondary uppercase tracking-wider">Autumn Cohort</span>
+</div>
+<!-- Epistles Ledger Rows -->
+<div class="space-y-space-xs">
+<!-- Correspondence 1 -->
+<div class="flex items-start justify-between p-space-sm rounded bg-surface-container hover:bg-surface-container-high transition-colors gap-space-sm group">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container mt-0.5">drafts</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-primary" contenteditable="true">
+                      Baroness Hélène de Valois — Paris
+                    </div>
+<div class="font-body-sm text-body-sm text-secondary italic" contenteditable="true">
+                      In reply to folio parcel of Oct 02. Inclosing wax specimens &amp; botanical press samples.
+                    </div>
+</div>
+</div>
+<span class="shrink-0 font-label-stamp text-label-stamp px-space-xs py-0.5 rounded bg-surface text-secondary shadow-sm uppercase tracking-wider">Pending Seal</span>
+</div>
+<!-- Correspondence 2 -->
+<div class="flex items-start justify-between p-space-sm rounded bg-surface-container hover:bg-surface-container-high transition-colors gap-space-sm group">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary mt-0.5">mark_email_read</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-primary" contenteditable="true">
+                      Bodleian Archival Conservator — Oxford
+                    </div>
+<div class="font-body-sm text-body-sm text-secondary italic" contenteditable="true">
+                      Inquiry regarding medieval flax sizing &amp; binding restoration protocols.
+                    </div>
+</div>
+</div>
+<span class="shrink-0 font-label-stamp text-label-stamp px-space-xs py-0.5 rounded bg-surface text-secondary shadow-sm uppercase tracking-wider">Dispatched Oct 11</span>
+</div>
+<!-- Correspondence 3 -->
+<div class="flex items-start justify-between p-space-sm rounded bg-surface-container hover:bg-surface-container-high transition-colors gap-space-sm group">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary mt-0.5">edit_calendar</span>
+<div>
+<div class="font-body-md text-body-md font-semibold text-primary" contenteditable="true">
+                      M. Tanaka, Kyoto Paper Guild
+                    </div>
+<div class="font-body-sm text-body-sm text-secondary italic" contenteditable="true">
+                      Kozo Mulberry handmade papers selection for 2026 limited ledger run.
+                    </div>
+</div>
+</div>
+<span class="shrink-0 font-label-stamp text-label-stamp px-space-xs py-0.5 rounded bg-surface text-secondary shadow-sm uppercase tracking-wider">Awaiting Draft</span>
+</div>
+</div>
+</div>
+<!-- Section 3: Marginal Quick Notes & Brain Dump with Botanical Engraving -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md items-end">
+<div class="sm:col-span-2 space-y-space-xs">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">checklist</span>
+<span class="font-caption-caps text-caption-caps tracking-widest text-primary font-bold uppercase">Marginal Quick Notes &amp; Brain Dump</span>
+</div>
+<ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface">
+<li class="flex items-baseline gap-space-xs">
+<span class="font-label-mono text-secondary text-[11px]">01.</span>
+<span contenteditable="true">Procure 3 oz bone folder and raw beeswax cake for signature stitching.</span>
+</li>
+<li class="flex items-baseline gap-space-xs">
+<span class="font-label-mono text-secondary text-[11px]">02.</span>
+<span contenteditable="true">Remember: iron-gall ink must rest 48 hours after maceration of Aleppo galls.</span>
+</li>
+<li class="flex items-baseline gap-space-xs">
+<span class="font-label-mono text-secondary text-[11px]">03.</span>
+<span contenteditable="true">Calibrate the letterpress platen gauge to 0.918 in. (standard type-high).</span>
+</li>
+</ul>
+</div>
+<!-- Botanical Copperplate Vignette Illustration -->
+<div class="sm:col-span-1 flex flex-col items-center justify-center p-space-sm bg-surface-container rounded border-0 text-center shadow-sm">
+<svg class="w-16 h-16 text-secondary/60 mb-1" fill="none" stroke="currentColor" stroke-width="1.2" viewbox="0 0 100 100">
+<!-- Classical Botanical Copperplate Engraving Motif -->
+<path d="M50 90 C50 60 48 30 50 10 C51 30 52 60 50 90 Z" fill="currentColor" fill-opacity="0.1"></path>
+<path d="M50 65 C40 58 32 45 35 32 C43 32 48 48 50 65 Z" stroke-dasharray="2 1"></path>
+<path d="M50 55 C60 48 68 35 65 22 C57 22 52 38 50 55 Z" stroke-dasharray="2 1"></path>
+<path d="M50 40 C42 32 36 22 40 12 C46 14 49 26 50 40 Z"></path>
+<path d="M50 30 C58 22 64 12 60 2 C54 4 51 16 50 30 Z"></path>
+<circle cx="50" cy="10" fill="currentColor" r="2.5"></circle>
+</svg>
+<span class="font-label-stamp text-[9px] tracking-widest text-secondary uppercase">Herba Salvia Officinalis</span>
+</div>
+</div>
+</div>
+<!-- Recto Footer Note & Folio Index -->
+<div class="relative z-10 pt-space-lg flex items-center justify-between text-secondary pr-2 sm:pr-4">
+<span class="font-label-stamp text-label-stamp font-bold tracking-widest uppercase">Folio 77</span>
+<span class="font-label-stamp text-label-stamp tracking-widest uppercase">Smyth-Sewn Section VIII · Imprimerie Manuscrite</span>
+</div>
+</div>
+</div>
+<!-- Stationary Action Strip & Controls Below Book -->
+<div class="max-w-[1320px] mx-auto mt-space-md flex flex-wrap items-center justify-between gap-space-md px-space-xs text-secondary-fixed">
+<div class="flex items-center gap-space-md">
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded bg-tertiary-container hover:bg-tertiary-container/80 text-secondary-fixed font-caption-caps text-caption-caps uppercase tracking-wider shadow-sm transition-all" onclick="window.print()" type="button">
+<span class="material-symbols-outlined text-[16px]">print</span>
+<span>Tirer une Épreuve (Print Folio)</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-caption-caps text-caption-caps uppercase tracking-wider shadow-sm transition-all" onclick="addNewMarginalia()" type="button">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span>Ajouter une Réflexion</span>
+</button>
+</div>
+<div class="flex items-center gap-space-md font-label-mono text-label-mono text-secondary-fixed-dim">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+<span>Encre: Iron-Gall Grisaille</span>
+</span>
+<span class="hidden sm:inline">·</span>
+<span>Grain Papier: 100% Cotton Rag Chamois</span>
+</div>
+</div>
+</div>
+<script>
+    function toggleMobilePage(page) {
+      const verso = document.getElementById('folio-verso');
+      const recto = document.getElementById('folio-recto');
+      const btnVerso = document.getElementById('tab-verso-btn');
+      const btnRecto = document.getElementById('tab-recto-btn');
+
+      if (!verso || !recto || !btnVerso || !btnRecto) return;
+
+      if (page === 'verso') {
+        verso.classList.remove('hidden');
+        recto.classList.add('hidden');
+        btnVerso.classList.add('bg-surface', 'text-on-surface', 'shadow-sm');
+        btnVerso.classList.remove('text-on-surface-variant');
+        btnRecto.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
+        btnRecto.classList.add('text-on-surface-variant');
+      } else {
+        verso.classList.add('hidden');
+        recto.classList.remove('hidden');
+        btnRecto.classList.add('bg-surface', 'text-on-surface', 'shadow-sm');
+        btnRecto.classList.remove('text-on-surface-variant');
+        btnVerso.classList.remove('bg-surface', 'text-on-surface', 'shadow-sm');
+        btnVerso.classList.add('text-on-surface-variant');
+      }
+    }
+
+    function addNewMarginalia() {
+      const quoteBox = document.querySelector('#folio-verso .space-y-space-md');
+      if (!quoteBox) return;
+      const newParagraph = document.createElement('p');
+      newParagraph.className = 'leading-[24px] text-justify text-on-surface';
+      newParagraph.contentEditable = "true";
+      newParagraph.textContent = 'Transcribe your thought here; press tab to preserve margin alignment...';
+      quoteBox.appendChild(newParagraph);
+      newParagraph.focus();
+    }
+  </script>
+</div></div><div class="hidden md:flex flex-col gap-1.5 pt-space-xl -ml-1 z-30 select-none"><nav class="flex flex-col gap-1.5" data-active-classes="bg-surface text-on-surface shadow-[-2px_2px_6px_rgba(0,0,0,0.18)] translate-x-1 pl-4"><a class="px-3 py-3 rounded-r-md font-label-stamp text-label-stamp bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all shadow-[2px_2px_5px_rgba(0,0,0,0.18)] tracking-widest uppercase writing-mode-vertical" data-path="agenda-daily" href="#">Daily</a><a class="px-3 py-3 rounded-r-md font-label-stamp text-label-stamp bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all shadow-[2px_2px_5px_rgba(0,0,0,0.18)] tracking-widest uppercase writing-mode-vertical" data-path="agenda-weekly" href="#">Weekly</a><a class="px-3 py-3 rounded-r-md font-label-stamp text-label-stamp bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all shadow-[2px_2px_5px_rgba(0,0,0,0.18)] tracking-widest uppercase writing-mode-vertical" data-path="agenda-monthly" href="#">Monthly</a><a aria-current="page" class="px-3 py-3 rounded-r-md font-label-stamp transition-all tracking-widest uppercase writing-mode-vertical bg-surface text-on-surface shadow-[-2px_2px_6px_rgba(0,0,0,0.18)] translate-x-1 pl-4" data-path="agenda-notes" href="#">Notes</a></nav></div></div></div></main><footer class="w-full bg-tertiary py-space-lg shadow-[0_-1px_12px_rgba(0,0,0,0.25)]"><div class="max-w-7xl mx-auto px-margin md:px-margin-desktop flex flex-col md:flex-row items-center justify-between gap-space-md text-center md:text-left"><p class="font-caption-caps text-caption-caps text-secondary-fixed-dim uppercase tracking-widest">L'Édition Manuscrite · Reliure Smyth-Sewn · Archival Paper Stock</p><nav class="flex items-center gap-space-lg text-body-sm font-body-sm text-secondary-fixed-dim" data-active-classes="text-secondary-fixed underline"><a class="hover:text-secondary-fixed transition-colors font-caption-caps text-caption-caps uppercase tracking-wider" data-path="agenda-index" href="#">Index des Pages</a><a class="hover:text-secondary-fixed transition-colors font-caption-caps text-caption-caps uppercase tracking-wider" data-path="agenda-ribbon" href="#">Ruban Marqueur</a><a class="hover:text-secondary-fixed transition-colors font-caption-caps text-caption-caps uppercase tracking-wider" data-path="agenda-archivist" href="#">Archiviste Privé</a></nav></div></footer></body></html>

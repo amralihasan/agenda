@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  date        String    // Format: YYYY-MM-DD
+  startTime   String?   // Format: HH:mm
+  endTime     String?   // Format: HH:mm
+  priority    String    @default("normal") // "urgent", "normal", "low"
+  status      String    @default("pending") // "pending", "completed", "migrated"
+  isCompleted Boolean   @default(false)
+  order       Int       @default(0)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([date])
+}
+
+model DailyPriority {
+  id          String   @id @default(cuid())
+  date        String   // Format: YYYY-MM-DD
+  position    Int      // 1, 2, or 3
+  title       String
+  isCompleted Boolean  @default(false)
+  category    String?  // e.g. "Urgent", "Complété", "Important"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date, position])
+  @@index([date])
+}
+
+model ScheduleEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        String   // Format: YYYY-MM-DD
+  startTime   String   // Format: HH:mm (e.g. "09:00")
+  endTime     String   // Format: HH:mm (e.g. "10:30")
+  location    String?
+  category    String?  // e.g. "Atelier", "Salle I", "M. de R."
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}
+
+model DailyNote {
+  id          String   @id @default(cuid())
+  date        String   @unique // Format: YYYY-MM-DD
+  content     String   @default("")
+  quote       String?
+  quoteAuthor String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WeeklyPlan {
+  id            String   @id @default(cuid())
+  weekStartDate String   @unique // Format: YYYY-MM-DD (Monday or start of week)
+  title         String?
+  goals         String?  // JSON serialized array of goals [{ id, text, isCompleted, position }]
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  title      String
+  content    String
+  date       String?  // Optional linked date (YYYY-MM-DD)
+  category   String   @default("General")
+  paperStyle String   @default("ruled") // "ruled", "grid", "blank"
+  isPinned   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String
+  tasks     Task[]
+  createdAt DateTime @default(now())
+}
+
+model AppSettings {
+  id             String   @id @default("default")
+  language       String   @default("ar") // "en" | "ar"
+  firstDayOfWeek Int      @default(1) // 0: Sunday, 1: Monday, 6: Saturday
+  startHour      Int      @default(6)
+  endHour        Int      @default(22)
+  paperTone      String   @default("ivory")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
