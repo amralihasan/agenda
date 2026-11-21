@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   format,
@@ -46,6 +46,41 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
   const isRtl = i18n.language === 'ar';
   const dateObj = parseISO(currentDate);
 
+  // Scroll-aware header: hide while descending, reveal while ascending.
+  // A small distance threshold plus rAF keeps it from flickering.
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+  const tickingRef = useRef(false);
+
+  useEffect(() => {
+    lastScrollYRef.current = window.scrollY;
+
+    const update = () => {
+      const currentY = window.scrollY;
+      const delta = currentY - lastScrollYRef.current;
+
+      if (Math.abs(delta) > 8) {
+        if (currentY <= 80) {
+          setIsHeaderVisible(true);
+        } else {
+          setIsHeaderVisible(delta < 0);
+        }
+        lastScrollYRef.current = currentY;
+      }
+
+      tickingRef.current = false;
+    };
+
+    const handleScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      window.requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const formattedDateFull = format(
     dateObj,
     isRtl ? 'EEEE، d MMMM yyyy' : 'EEEE · d MMMM yyyy',
@@ -92,7 +127,11 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#1a0302]/95 backdrop-blur-md border-b border-[#380a08] shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 bg-[#1a0302]/95 backdrop-blur-md border-b border-[#380a08] shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none ${
+        isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-[1440px] mx-auto h-14 sm:h-16 px-3 sm:px-6 lg:px-10 flex items-center justify-between">
         {/* Left: Book Crest */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
