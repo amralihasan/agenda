@@ -9,11 +9,13 @@ import { notesRouter } from './routes/notes.routes.js';
 import { weeklyRouter } from './routes/weekly.routes.js';
 import { settingsRouter } from './routes/settings.routes.js';
 import { backupRouter } from './routes/backup.routes.js';
+import { voiceNotesRouter } from './routes/voice-notes.routes.js';
 
 export const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // API Routes
 app.use('/api', agendaRouter);
@@ -23,6 +25,7 @@ app.use('/api/schedule-events', eventsRouter);
 app.use('/api/daily-notes', dailyNotesRouter);
 app.use('/api/weekly-plan', weeklyRouter);
 app.use('/api/notes', notesRouter);
+app.use('/api/voice-notes', voiceNotesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/backup', backupRouter);
 

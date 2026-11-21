@@ -72,3 +72,11 @@ export const AppSettingsUpdateSchema = z.object({
   endHour: z.number().int().min(0).max(23).optional(),
   paperTone: z.string().optional(),
 });
+
+export const VoiceNoteCreateSchema = z.object({
+  title: z.string().optional().nullable(),
+  audioData: z.string().min(1, 'Audio data is required'),
+  duration: z.number().int().min(0).default(0),
+  targetType: z.enum(['daily', 'weekly', 'note']),
+  targetId: z.string().min(1, 'Target ID is required'),
+});

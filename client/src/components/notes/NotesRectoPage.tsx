@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BookOpen } from 'lucide-react';
 import { Note } from '../../types';
 import { PageFooter } from '../book/PageFooter';
+import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 
 interface NotesRectoPageProps {
   activeNote: Note | null;
@@ -146,13 +147,24 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
           </div>
 
           {/* Note Title Input */}
-          <div className="mb-3">
+          <div className="mb-2">
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('notes.noteTitlePlaceholder')}
               className="w-full bg-transparent border-b border-[#e5e2dc] pb-1.5 font-headline-lg text-2xl text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613]"
+            />
+          </div>
+
+          {/* Voice Notes & Dictation Toolbar */}
+          <div className="mb-2">
+            <VoiceNoteSection
+              targetType="note"
+              targetId={activeNote.id}
+              onTranscribeText={(text) => {
+                setContent((prev) => (prev ? prev + ' ' + text : text));
+              }}
             />
           </div>
 

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Task, DailyNote } from '../../types';
 import { PageFooter } from '../book/PageFooter';
+import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 
 interface DailyRectoPageProps {
   date: string;
@@ -201,7 +202,7 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
         {/* Section: Notebook Ruled Lines for Personal Notes */}
         <section className="flex-1 min-h-[300px] sm:min-h-[340px] pt-3 relative rounded-sm border border-[#e5e2dc]/70 p-3 sm:p-4 bg-[#fcf9f3]">
           {/* Header inside Note Field */}
-          <div className="flex items-center justify-between mb-3 relative z-10 border-b border-[#e5e2dc]/80 pb-1.5">
+          <div className="flex items-center justify-between mb-2 relative z-10 border-b border-[#e5e2dc]/80 pb-1.5">
             <div className="flex items-center gap-1.5 font-caption-caps text-caption-caps text-[#675d52] uppercase tracking-widest">
               <Sparkles className="w-3.5 h-3.5 text-[#da664d]" />
               <span>{t('daily.notesTitle')}</span>
@@ -216,6 +217,17 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
                 {date}
               </span>
             </div>
+          </div>
+
+          {/* Voice Notes & Speech Dictation Toolbar */}
+          <div className="relative z-10 mb-2">
+            <VoiceNoteSection
+              targetType="daily"
+              targetId={date}
+              onTranscribeText={(text) => {
+                setNoteContent((prev) => (prev ? prev + ' ' + text : text));
+              }}
+            />
           </div>
 
           {/* Auto-saving textarea styled as notebook lines with 32px line-height */}

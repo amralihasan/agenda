@@ -76,6 +76,17 @@ export interface Note {
   updatedAt?: string;
 }
 
+export interface VoiceNote {
+  id: string;
+  title?: string | null;
+  audioData: string; // base64 data URL
+  duration: number; // in seconds
+  targetType: 'daily' | 'weekly' | 'note';
+  targetId: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface AppSettings {
   id: string;
   language: 'en' | 'ar';

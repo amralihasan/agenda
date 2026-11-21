@@ -142,5 +142,22 @@
     "saveSuccess": "Settings updated successfully.",
     "saveSettings": "Apply Settings",
     "close": "Close"
+  },
+  "voiceNotes": {
+    "title": "Voice Notes & Dictation",
+    "recordAudio": "Record Voice Note",
+    "dictateText": "Voice Dictation",
+    "recording": "Recording in progress...",
+    "listening": "Listening to dictation...",
+    "stopAndSave": "Save Note",
+    "cancel": "Cancel",
+    "stopDictation": "Stop Dictation",
+    "noNotes": "No voice recordings yet.",
+    "play": "Play",
+    "pause": "Pause",
+    "delete": "Delete recording",
+    "micPermissionDenied": "Microphone access was denied or is unavailable.",
+    "speechNotSupported": "Voice dictation is not supported in this browser.",
+    "count": "Voice Notes"
   }
 }

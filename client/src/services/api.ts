@@ -143,4 +143,25 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(backupData),
     }),
+
+  // Voice Notes
+  getVoiceNotes: (targetType: 'daily' | 'weekly' | 'note', targetId: string) =>
+    fetchJson<import('../types').VoiceNote[]>(
+      `/voice-notes?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}`
+    ),
+  createVoiceNote: (data: {
+    title?: string | null;
+    audioData: string;
+    duration: number;
+    targetType: 'daily' | 'weekly' | 'note';
+    targetId: string;
+  }) =>
+    fetchJson<import('../types').VoiceNote>('/voice-notes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  deleteVoiceNote: (id: string) =>
+    fetchJson<{ success: boolean; id: string }>(`/voice-notes/${id}`, {
+      method: 'DELETE',
+    }),
 };

@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { WeeklyAgendaResponse, Task } from '../../types';
 import { PageFooter } from '../book/PageFooter';
+import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 
 interface WeeklyRectoPageProps {
   weeklyData: WeeklyAgendaResponse | null;
@@ -148,6 +149,21 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
               {monthYearLabel}
             </span>
           </div>
+
+          {weeklyData?.weekStartDate && (
+            <VoiceNoteSection
+              targetType="weekly"
+              targetId={weeklyData.weekStartDate}
+              onTranscribeText={(text) => {
+                setWeeklyNotes((prev) => {
+                  const updated = prev ? prev + ' ' + text : text;
+                  onSaveWeeklyPlan(weeklyData.weekStartDate, { notes: updated });
+                  return updated;
+                });
+              }}
+            />
+          )}
+
           <textarea
             rows={4}
             value={weeklyNotes}

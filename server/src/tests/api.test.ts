@@ -59,4 +59,31 @@ describe('Digital Paper Agenda API', () => {
     expect(res.status).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
   });
+
+  it('Voice Notes CRUD: POST, GET, DELETE /api/voice-notes should work', async () => {
+    // 1. Create a voice note
+    const createRes = await request(app).post('/api/voice-notes').send({
+      targetType: 'daily',
+      targetId: '2025-10-15',
+      audioData: 'data:audio/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQRChYECGFOAZwE=',
+      duration: 12,
+    });
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.targetType).toBe('daily');
+    expect(createRes.body.targetId).toBe('2025-10-15');
+    expect(createRes.body.duration).toBe(12);
+    const voiceNoteId = createRes.body.id;
+
+    // 2. Fetch voice notes for daily target
+    const getRes = await request(app).get('/api/voice-notes?targetType=daily&targetId=2025-10-15');
+    expect(getRes.status).toBe(200);
+    expect(Array.isArray(getRes.body)).toBe(true);
+    const found = getRes.body.find((n: any) => n.id === voiceNoteId);
+    expect(found).toBeDefined();
+
+    // 3. Delete voice note
+    const delRes = await request(app).delete(`/api/voice-notes/${voiceNoteId}`);
+    expect(delRes.status).toBe(200);
+    expect(delRes.body.success).toBe(true);
+  });
 });
