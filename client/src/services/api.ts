@@ -97,7 +97,15 @@ export const api = {
   // Daily Notes
   getDailyNote: (date: string) =>
     fetchJson<DailyNote>(`/daily-notes/${date}`),
-  saveDailyNote: (date: string, data: { content: string; quote?: string | null; quoteAuthor?: string | null }) =>
+  saveDailyNote: (
+    date: string,
+    data: {
+      content: string;
+      noteType?: 'text' | 'code';
+      quote?: string | null;
+      quoteAuthor?: string | null;
+    }
+  ) =>
     fetchJson<DailyNote>(`/daily-notes/${date}`, {
       method: 'PUT',
       body: JSON.stringify(data),

@@ -43,6 +43,7 @@ export const ScheduleEventUpdateSchema = ScheduleEventCreateSchema.partial();
 
 export const DailyNoteUpsertSchema = z.object({
   content: z.string().default(''),
+  noteType: z.enum(['text', 'code']).default('text').optional(),
   quote: z.string().optional().nullable(),
   quoteAuthor: z.string().optional().nullable(),
 });
@@ -52,11 +53,13 @@ export const WeeklyPlanUpsertSchema = z.object({
   title: z.string().optional().nullable(),
   goals: z.string().optional().nullable(), // JSON string
   notes: z.string().optional().nullable(),
+  noteType: z.enum(['text', 'code']).default('text').optional(),
 });
 
 export const NoteCreateSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   content: z.string().default(''),
+  noteType: z.enum(['text', 'code']).default('text').optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   category: z.string().default('General'),
   paperStyle: z.enum(['ruled', 'grid', 'blank']).default('ruled'),

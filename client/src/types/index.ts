@@ -45,6 +45,7 @@ export interface DailyNote {
   id: string;
   date: string;
   content: string;
+  noteType?: 'text' | 'code';
   quote?: string | null;
   quoteAuthor?: string | null;
 }
@@ -62,12 +63,14 @@ export interface WeeklyPlan {
   title?: string | null;
   goals: string | null; // JSON string of WeeklyGoal[]
   notes?: string | null;
+  noteType?: 'text' | 'code';
 }
 
 export interface Note {
   id: string;
   title: string;
   content: string;
+  noteType?: 'text' | 'code';
   date?: string | null;
   category: string;
   paperStyle: 'ruled' | 'grid' | 'blank';

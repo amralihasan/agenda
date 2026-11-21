@@ -13,6 +13,7 @@ import { Task, DailyNote } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
+import { CodeOrTextEditor } from '../notes/CodeOrTextEditor';
 
 interface DailyRectoPageProps {
   date: string;
@@ -24,7 +25,7 @@ interface DailyRectoPageProps {
   onAddTask: (title: string) => void;
   onDeleteTask: (id: string) => void;
   onMoveTaskClick: (task: Task) => void;
-  onSaveDailyNote: (content: string) => void;
+  onSaveDailyNote: (content: string, noteType?: 'text' | 'code') => void;
 }
 
 export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
@@ -44,25 +45,32 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [noteContent, setNoteContent] = useState(dailyNote?.content || '');
+  const [noteType, setNoteType] = useState<'text' | 'code'>(dailyNote?.noteType || 'text');
   const [isSavingNote, setIsSavingNote] = useState(false);
 
   // Sync state when dailyNote changes externally (e.g. date change)
   useEffect(() => {
     setNoteContent(dailyNote?.content || '');
+    setNoteType(dailyNote?.noteType || 'text');
   }, [dailyNote, date]);
 
   // Debounced auto-save for daily note
   useEffect(() => {
-    if (noteContent === (dailyNote?.content || '')) return;
+    if (
+      noteContent === (dailyNote?.content || '') &&
+      noteType === (dailyNote?.noteType || 'text')
+    ) {
+      return;
+    }
 
     setIsSavingNote(true);
     const timeout = setTimeout(() => {
-      onSaveDailyNote(noteContent);
+      onSaveDailyNote(noteContent, noteType);
       setIsSavingNote(false);
     }, 750);
 
     return () => clearTimeout(timeout);
-  }, [noteContent, dailyNote, onSaveDailyNote]);
+  }, [noteContent, noteType, dailyNote, onSaveDailyNote]);
 
   const handleTaskKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTaskTitle.trim() !== '') {
@@ -232,15 +240,20 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
             <ImageAttachmentSection targetType="daily" targetId={date} />
           </div>
 
-          {/* Auto-saving textarea styled as notebook lines with 32px line-height */}
+          {/* Auto-saving editor: styled as notebook lines or formatted code terminal */}
           <div className="relative z-10">
-            <textarea
+            <CodeOrTextEditor
+              content={noteContent}
+              onChange={setNoteContent}
+              noteType={noteType}
+              onNoteTypeChange={(type) => {
+                setNoteType(type);
+                onSaveDailyNote(noteContent, type);
+              }}
+              paperStyle="ruled"
               rows={8}
-              value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
+              minHeight="220px"
               placeholder={t('daily.notesPlaceholder')}
-              className="w-full border-0 p-0 font-body-script text-base text-[#080c12] placeholder:text-[#675d52]/40 placeholder:italic focus:outline-none focus:ring-0 resize-y min-h-[220px] paper-notebook-lines"
-              style={{ lineHeight: '32px' }}
             />
           </div>
 

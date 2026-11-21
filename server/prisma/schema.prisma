@@ -59,6 +59,7 @@ model DailyNote {
   id          String   @id @default(cuid())
   date        String   @unique // Format: YYYY-MM-DD
   content     String   @default("")
+  noteType    String   @default("text") // "text" | "code"
   quote       String?
   quoteAuthor String?
   createdAt   DateTime @default(now())
@@ -71,6 +72,7 @@ model WeeklyPlan {
   title         String?
   goals         String?  // JSON serialized array of goals [{ id, text, isCompleted, position }]
   notes         String?
+  noteType      String   @default("text") // "text" | "code"
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -79,6 +81,7 @@ model Note {
   id         String   @id @default(cuid())
   title      String
   content    String
+  noteType   String   @default("text") // "text" | "code"
   date       String?  // Optional linked date (YYYY-MM-DD)
   category   String   @default("General")
   paperStyle String   @default("ruled") // "ruled", "grid", "blank"

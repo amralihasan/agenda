@@ -268,9 +268,9 @@ export const App: React.FC = () => {
   };
 
   // Daily note action
-  const handleSaveDailyNote = async (content: string) => {
+  const handleSaveDailyNote = async (content: string, noteType?: 'text' | 'code') => {
     try {
-      const updated = await api.saveDailyNote(currentDate, { content });
+      const updated = await api.saveDailyNote(currentDate, { content, noteType });
       setDailyData((prev) =>
         prev ? { ...prev, dailyNote: updated } : prev
       );

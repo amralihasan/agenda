@@ -5,6 +5,7 @@ import { Note } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
+import { CodeOrTextEditor } from './CodeOrTextEditor';
 
 interface NotesRectoPageProps {
   activeNote: Note | null;
@@ -22,6 +23,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
 
   const [title, setTitle] = useState(activeNote?.title || '');
   const [content, setContent] = useState(activeNote?.content || '');
+  const [noteType, setNoteType] = useState<'text' | 'code'>(activeNote?.noteType || 'text');
   const [paperStyle, setPaperStyle] = useState<'ruled' | 'grid' | 'blank'>(
     activeNote?.paperStyle || 'ruled'
   );
@@ -33,6 +35,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
     if (activeNote) {
       setTitle(activeNote.title);
       setContent(activeNote.content);
+      setNoteType(activeNote.noteType || 'text');
       setPaperStyle(activeNote.paperStyle || 'ruled');
       setCategory(activeNote.category || 'General');
       setDate(activeNote.date || '');
@@ -45,6 +48,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
     if (
       title === activeNote.title &&
       content === activeNote.content &&
+      noteType === (activeNote.noteType || 'text') &&
       paperStyle === activeNote.paperStyle &&
       category === activeNote.category &&
       date === activeNote.date
@@ -57,6 +61,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
       await onUpdateNote(activeNote.id, {
         title,
         content,
+        noteType,
         paperStyle,
         category,
         date: date || null,
@@ -65,7 +70,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
     }, 700);
 
     return () => clearTimeout(timeout);
-  }, [title, content, paperStyle, category, date, activeNote, onUpdateNote]);
+  }, [title, content, noteType, paperStyle, category, date, activeNote, onUpdateNote]);
 
   return (
     <div className="flex-1 flex flex-col justify-between relative select-text">
@@ -173,23 +178,22 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
             />
           </div>
 
-          {/* Note Manuscript Writing Area */}
+          {/* Note Manuscript Writing Area (Text or Code) */}
           <div
             className="p-3 sm:p-4 rounded-sm min-h-[440px] border border-[#e5e2dc]/40 relative bg-[#fdfbf7]"
           >
-            <textarea
+            <CodeOrTextEditor
+              content={content}
+              onChange={setContent}
+              noteType={noteType}
+              onNoteTypeChange={(type) => {
+                setNoteType(type);
+                onUpdateNote(activeNote.id, { noteType: type });
+              }}
+              paperStyle={paperStyle}
               rows={15}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              minHeight="400px"
               placeholder={t('notes.noteContentPlaceholder')}
-              className={`w-full border-0 p-0 font-body-script text-base text-[#080c12] placeholder:text-[#675d52]/40 placeholder:italic focus:outline-none focus:ring-0 resize-none min-h-[400px] ${
-                paperStyle === 'ruled'
-                  ? 'paper-notebook-lines'
-                  : paperStyle === 'grid'
-                  ? 'paper-dot-grid'
-                  : 'bg-transparent'
-              }`}
-              style={{ lineHeight: '32px' }}
             />
           </div>
         </div>

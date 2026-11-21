@@ -6,6 +6,7 @@ import { WeeklyAgendaResponse, Task } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
 import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
+import { CodeOrTextEditor } from '../notes/CodeOrTextEditor';
 
 interface WeeklyRectoPageProps {
   weeklyData: WeeklyAgendaResponse | null;
@@ -26,17 +27,22 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
   const [weeklyNotes, setWeeklyNotes] = useState(
     weeklyData?.weeklyPlan?.notes || ''
   );
+  const [noteType, setNoteType] = useState<'text' | 'code'>(
+    weeklyData?.weeklyPlan?.noteType || 'text'
+  );
 
   useEffect(() => {
     if (weeklyData?.weeklyPlan?.notes !== undefined) {
       setWeeklyNotes(weeklyData.weeklyPlan.notes || '');
+      setNoteType(weeklyData.weeklyPlan.noteType || 'text');
     }
   }, [weeklyData]);
 
-  const handleSaveNotesBlur = () => {
+  const handleSaveNotesBlur = (newContent = weeklyNotes, newType = noteType) => {
     if (!weeklyData) return;
     onSaveWeeklyPlan(weeklyData.weekStartDate, {
-      notes: weeklyNotes,
+      notes: newContent,
+      noteType: newType,
     });
   };
 
@@ -171,14 +177,25 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
             </div>
           )}
 
-          <textarea
+          <CodeOrTextEditor
+            content={weeklyNotes}
+            onChange={(val) => {
+              setWeeklyNotes(val);
+              handleSaveNotesBlur(val, noteType);
+            }}
+            noteType={noteType}
+            onNoteTypeChange={(type) => {
+              setNoteType(type);
+              handleSaveNotesBlur(weeklyNotes, type);
+            }}
+            paperStyle="ruled"
             rows={4}
-            value={weeklyNotes}
-            onChange={(e) => setWeeklyNotes(e.target.value)}
-            onBlur={handleSaveNotesBlur}
-            placeholder={isRtl ? 'دوّن الملاحظات الأسبوعية والتفاصيل التنفيذية...' : 'Inscribe overall weekly observations and notes...'}
-            className="w-full border-0 p-0 font-body-script text-sm text-[#080c12] placeholder:text-[#675d52]/40 placeholder:italic focus:outline-none focus:ring-0 resize-none paper-notebook-lines"
-            style={{ lineHeight: '32px' }}
+            minHeight="140px"
+            placeholder={
+              isRtl
+                ? 'دوّن الملاحظات الأسبوعية والتفاصيل التنفيذية...'
+                : 'Inscribe overall weekly observations and notes...'
+            }
           />
         </section>
       </div>
