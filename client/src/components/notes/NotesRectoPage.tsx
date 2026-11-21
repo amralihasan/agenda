@@ -107,10 +107,10 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
   // The single unified note element (rendered in portal when fullscreen, or in-spread when normal)
   const noteElement = (
     <div
-      className={`flex-1 flex flex-col justify-between relative select-text transition-all duration-150 ${
+      className={`flex-1 flex flex-col justify-between select-text transition-all duration-150 ${
         isFolioFullscreen
-          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto animate-in fade-in shadow-2xl'
-          : ''
+          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto shadow-2xl'
+          : 'relative'
       }`}
       dir={isRtl ? 'rtl' : 'ltr'}
     >

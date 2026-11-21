@@ -19,13 +19,13 @@ import {
   Languages,
   BookOpen,
 } from 'lucide-react';
-import { setAppLanguage } from '../../i18n/i18n';
 import { AgendaSection } from './IndexTabs';
 
 interface HeaderBannerProps {
   currentDate: string; // YYYY-MM-DD
   onDateChange: (newDate: string) => void;
   onOpenSettings: () => void;
+  onLanguageChange: (lang: 'en' | 'ar') => void;
   activeSection?: AgendaSection;
 }
 
@@ -33,6 +33,7 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
   currentDate,
   onDateChange,
   onOpenSettings,
+  onLanguageChange,
   activeSection = 'daily',
 }) => {
   const { t, i18n } = useTranslation();
@@ -81,7 +82,7 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
 
   const toggleLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'ar' : 'en';
-    setAppLanguage(nextLang);
+    onLanguageChange(nextLang);
   };
 
   return (
