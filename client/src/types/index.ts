@@ -87,6 +87,16 @@ export interface VoiceNote {
   updatedAt?: string;
 }
 
+export interface ImageAttachment {
+  id: string;
+  caption?: string | null;
+  imageData: string; // base64 data URL
+  targetType: 'daily' | 'weekly' | 'note';
+  targetId: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface AppSettings {
   id: string;
   language: 'en' | 'ar';

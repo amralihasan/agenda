@@ -5,6 +5,7 @@ import { ar, enUS } from 'date-fns/locale';
 import { WeeklyAgendaResponse, Task } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
+import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
 
 interface WeeklyRectoPageProps {
   weeklyData: WeeklyAgendaResponse | null;
@@ -151,17 +152,23 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
           </div>
 
           {weeklyData?.weekStartDate && (
-            <VoiceNoteSection
-              targetType="weekly"
-              targetId={weeklyData.weekStartDate}
-              onTranscribeText={(text) => {
-                setWeeklyNotes((prev) => {
-                  const updated = prev ? prev + ' ' + text : text;
-                  onSaveWeeklyPlan(weeklyData.weekStartDate, { notes: updated });
-                  return updated;
-                });
-              }}
-            />
+            <div className="space-y-1.5 mb-2">
+              <VoiceNoteSection
+                targetType="weekly"
+                targetId={weeklyData.weekStartDate}
+                onTranscribeText={(text) => {
+                  setWeeklyNotes((prev) => {
+                    const updated = prev ? prev + ' ' + text : text;
+                    onSaveWeeklyPlan(weeklyData.weekStartDate, { notes: updated });
+                    return updated;
+                  });
+                }}
+              />
+              <ImageAttachmentSection
+                targetType="weekly"
+                targetId={weeklyData.weekStartDate}
+              />
+            </div>
           )}
 
           <textarea

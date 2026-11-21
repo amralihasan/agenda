@@ -80,3 +80,10 @@ export const VoiceNoteCreateSchema = z.object({
   targetType: z.enum(['daily', 'weekly', 'note']),
   targetId: z.string().min(1, 'Target ID is required'),
 });
+
+export const ImageAttachmentCreateSchema = z.object({
+  caption: z.string().optional().nullable(),
+  imageData: z.string().min(1, 'Image data is required'),
+  targetType: z.enum(['daily', 'weekly', 'note']),
+  targetId: z.string().min(1, 'Target ID is required'),
+});

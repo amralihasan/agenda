@@ -12,6 +12,7 @@ import {
 import { Task, DailyNote } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
+import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
 
 interface DailyRectoPageProps {
   date: string;
@@ -219,8 +220,8 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
             </div>
           </div>
 
-          {/* Voice Notes & Speech Dictation Toolbar */}
-          <div className="relative z-10 mb-2">
+          {/* Voice Notes & Media Attachments Toolbar */}
+          <div className="relative z-10 mb-2 space-y-1.5">
             <VoiceNoteSection
               targetType="daily"
               targetId={date}
@@ -228,6 +229,7 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
                 setNoteContent((prev) => (prev ? prev + ' ' + text : text));
               }}
             />
+            <ImageAttachmentSection targetType="daily" targetId={date} />
           </div>
 
           {/* Auto-saving textarea styled as notebook lines with 32px line-height */}

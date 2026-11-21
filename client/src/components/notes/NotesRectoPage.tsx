@@ -4,6 +4,7 @@ import { BookOpen } from 'lucide-react';
 import { Note } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 import { VoiceNoteSection } from '../audio/VoiceNoteSection';
+import { ImageAttachmentSection } from '../media/ImageAttachmentSection';
 
 interface NotesRectoPageProps {
   activeNote: Note | null;
@@ -157,14 +158,18 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
             />
           </div>
 
-          {/* Voice Notes & Dictation Toolbar */}
-          <div className="mb-2">
+          {/* Voice Notes & Media Attachments Toolbar */}
+          <div className="mb-2 space-y-1.5">
             <VoiceNoteSection
               targetType="note"
               targetId={activeNote.id}
               onTranscribeText={(text) => {
                 setContent((prev) => (prev ? prev + ' ' + text : text));
               }}
+            />
+            <ImageAttachmentSection
+              targetType="note"
+              targetId={activeNote.id}
             />
           </div>
 

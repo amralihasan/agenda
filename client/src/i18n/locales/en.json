@@ -159,5 +159,17 @@
     "micPermissionDenied": "Microphone access was denied or is unavailable.",
     "speechNotSupported": "Voice dictation is not supported in this browser.",
     "count": "Voice Notes"
+  },
+  "images": {
+    "title": "Archival Plates & Images",
+    "addImage": "Attach Image",
+    "uploadPrompt": "Upload photograph, sketch or document clipping",
+    "dropPrompt": "Drop image here to attach",
+    "caption": "Plate description / caption",
+    "delete": "Remove plate",
+    "viewFull": "View Full Plate",
+    "noImages": "No attached images",
+    "count": "Plates / Images",
+    "uploadError": "Failed to load or process image."
   }
 }

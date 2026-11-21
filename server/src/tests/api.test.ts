@@ -86,4 +86,31 @@ describe('Digital Paper Agenda API', () => {
     expect(delRes.status).toBe(200);
     expect(delRes.body.success).toBe(true);
   });
+
+  it('Image Attachments CRUD: POST, GET, DELETE /api/images should work', async () => {
+    // 1. Create an image attachment
+    const createRes = await request(app).post('/api/images').send({
+      targetType: 'note',
+      targetId: 'test-note-1',
+      caption: 'Architectural Sketch',
+      imageData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    });
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.targetType).toBe('note');
+    expect(createRes.body.targetId).toBe('test-note-1');
+    expect(createRes.body.caption).toBe('Architectural Sketch');
+    const imageId = createRes.body.id;
+
+    // 2. Fetch images for note target
+    const getRes = await request(app).get('/api/images?targetType=note&targetId=test-note-1');
+    expect(getRes.status).toBe(200);
+    expect(Array.isArray(getRes.body)).toBe(true);
+    const found = getRes.body.find((img: any) => img.id === imageId);
+    expect(found).toBeDefined();
+
+    // 3. Delete image
+    const delRes = await request(app).delete(`/api/images/${imageId}`);
+    expect(delRes.status).toBe(200);
+    expect(delRes.body.success).toBe(true);
+  });
 });

@@ -164,4 +164,24 @@ export const api = {
     fetchJson<{ success: boolean; id: string }>(`/voice-notes/${id}`, {
       method: 'DELETE',
     }),
+
+  // Image Attachments
+  getImages: (targetType: 'daily' | 'weekly' | 'note', targetId: string) =>
+    fetchJson<import('../types').ImageAttachment[]>(
+      `/images?targetType=${targetType}&targetId=${encodeURIComponent(targetId)}`
+    ),
+  createImage: (data: {
+    caption?: string | null;
+    imageData: string;
+    targetType: 'daily' | 'weekly' | 'note';
+    targetId: string;
+  }) =>
+    fetchJson<import('../types').ImageAttachment>('/images', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  deleteImage: (id: string) =>
+    fetchJson<{ success: boolean; id: string }>(`/images/${id}`, {
+      method: 'DELETE',
+    }),
 };

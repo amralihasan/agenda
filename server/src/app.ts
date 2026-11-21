@@ -10,6 +10,7 @@ import { weeklyRouter } from './routes/weekly.routes.js';
 import { settingsRouter } from './routes/settings.routes.js';
 import { backupRouter } from './routes/backup.routes.js';
 import { voiceNotesRouter } from './routes/voice-notes.routes.js';
+import { imagesRouter } from './routes/images.routes.js';
 
 export const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/daily-notes', dailyNotesRouter);
 app.use('/api/weekly-plan', weeklyRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/voice-notes', voiceNotesRouter);
+app.use('/api/images', imagesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/backup', backupRouter);
 
