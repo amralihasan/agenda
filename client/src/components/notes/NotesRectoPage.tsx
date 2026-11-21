@@ -92,286 +92,184 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
     return () => clearTimeout(timeout);
   }, [title, content, noteType, paperStyle, category, date, activeNote, onUpdateNote]);
 
-  return (
-    <div className="flex-1 flex flex-col justify-between relative select-text">
-      {/* Fullscreen Portal View - Mounted directly to document.body to cover all tabs and ribbons */}
-      {isFolioFullscreen && activeNote &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto animate-in fade-in duration-150"
-            dir={isRtl ? 'rtl' : 'ltr'}
-          >
-            {/* Fullscreen Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-[#e5e2dc] gap-3 shrink-0">
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => setIsFolioFullscreen(false)}
-                  className="px-3 py-1.5 rounded bg-[#832613] hover:bg-[#6e1e0d] text-white text-xs font-label-stamp flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-                  title={t('notes.exitFullscreen')}
-                >
-                  <Minimize2 className="w-4 h-4" />
-                  <span className="font-bold">{t('notes.exitFullscreen')}</span>
-                  <span className="text-[10px] opacity-80 font-mono hidden sm:inline">(Esc)</span>
-                </button>
+  if (!activeNote) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-[#675d52]">
+        <BookOpen className="w-12 h-12 opacity-30 mb-2" />
+        <p className="font-body-script text-base italic">
+          {isRtl ? 'اختر أو دوّن صفحة ملاحظات جديدة لقراءة مخطوطتها.' : 'Select or inscribe a folio note to read its manuscript.'}
+        </p>
+        <PageFooter side="right" pageNumber={77} subText={t('app.smythsonParis')} />
+      </div>
+    );
+  }
 
-                {/* Paper Style Selector */}
-                <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
-                  <button
-                    type="button"
-                    onClick={() => setPaperStyle('ruled')}
-                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
-                      paperStyle === 'ruled'
-                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                        : 'text-[#675d52]'
-                    }`}
-                  >
-                    {t('notes.ruled')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaperStyle('grid')}
-                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
-                      paperStyle === 'grid'
-                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                        : 'text-[#675d52]'
-                    }`}
-                  >
-                    {t('notes.grid')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaperStyle('blank')}
-                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
-                      paperStyle === 'blank'
-                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                        : 'text-[#675d52]'
-                    }`}
-                  >
-                    {t('notes.blank')}
-                  </button>
-                </div>
-
-                {isSaving && (
-                  <span className="font-label-mono text-xs text-[#832613] italic animate-pulse">
-                    {isRtl ? 'جارٍ الحفظ...' : 'Preserving...'}
-                  </span>
-                )}
-              </div>
-
-              {/* Category & Date Pickers */}
-              <div className="flex items-center gap-3">
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-xs text-[#080c12] focus:outline-none"
-                />
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-stamp text-xs uppercase text-[#832613] focus:outline-none cursor-pointer font-bold"
-                >
-                  {categories
-                    .filter((c) => c !== 'All')
-                    .map((cat) => (
-                      <option key={cat} value={cat}>
-                        {t(`notes.categories.${cat}`, cat)}
-                      </option>
-                    ))}
-                  {!categories.includes(category) && category !== 'All' && (
-                    <option value={category}>
-                      {t(`notes.categories.${category}`, category)}
-                    </option>
-                  )}
-                </select>
-              </div>
-            </div>
-
-            {/* Note Title Input */}
-            <div className="mb-4 shrink-0">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t('notes.noteTitlePlaceholder')}
-                className="w-full bg-transparent border-b border-[#e5e2dc] pb-2 font-headline-lg text-2xl sm:text-3xl text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613] font-bold"
-              />
-            </div>
-
-            {/* Voice & Image Bar */}
-            <div className="mb-3 shrink-0">
-              <VoiceNoteSection
-                targetType="note"
-                targetId={activeNote.id}
-                onTranscribeText={(text) => {
-                  setContent((prev) => (prev ? prev + ' ' + text : text));
-                }}
-              />
-              <ImageAttachmentSection targetType="note" targetId={activeNote.id} />
-            </div>
-
-            {/* Fullscreen Editor Area */}
-            <div className="flex-1 flex flex-col min-h-0 bg-white/40 rounded p-2 sm:p-4 border border-[#e5e2dc]/60">
-              <CodeOrTextEditor
-                content={content}
-                onChange={setContent}
-                paperStyle={paperStyle}
-                minHeight="calc(100vh - 320px)"
-                placeholder={t('notes.noteContentPlaceholder')}
-              />
-            </div>
-          </div>,
-          document.body
-        )}
-
-      {/* Normal In-Spread Note View */}
-      {activeNote ? (
-        <div className="flex-1 flex flex-col">
-          {/* Header Controls for Active Note */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-[#e5e2dc] gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Paper Style Selector */}
-              <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
-                <button
-                  type="button"
-                  onClick={() => setPaperStyle('ruled')}
-                  className={`px-2 py-0.5 rounded uppercase tracking-wider ${
-                    paperStyle === 'ruled'
-                      ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                      : 'text-[#675d52]'
-                  }`}
-                >
-                  {t('notes.ruled')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaperStyle('grid')}
-                  className={`px-2 py-0.5 rounded uppercase tracking-wider ${
-                    paperStyle === 'grid'
-                      ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                      : 'text-[#675d52]'
-                  }`}
-                >
-                  {t('notes.grid')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaperStyle('blank')}
-                  className={`px-2 py-0.5 rounded uppercase tracking-wider ${
-                    paperStyle === 'blank'
-                      ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                      : 'text-[#675d52]'
-                  }`}
-                >
-                  {t('notes.blank')}
-                </button>
-              </div>
-
-              {/* Fullscreen Toggle Button */}
+  // The single unified note element (rendered in portal when fullscreen, or in-spread when normal)
+  const noteElement = (
+    <div
+      className={`flex-1 flex flex-col justify-between relative select-text transition-all duration-150 ${
+        isFolioFullscreen
+          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto animate-in fade-in shadow-2xl'
+          : ''
+      }`}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
+      <div className="flex-1 flex flex-col">
+        {/* Header Controls for Active Note */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-[#e5e2dc] gap-2 shrink-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Paper Style Selector */}
+            <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
               <button
                 type="button"
-                onClick={() => setIsFolioFullscreen(true)}
-                className="px-2 py-1 rounded bg-[#f0eee8] hover:bg-[#e5e2dc] text-[#080c12] text-xs font-label-stamp flex items-center gap-1 transition-colors cursor-pointer border border-[#dcd8ce] shadow-2xs"
-                title={t('notes.fullscreen')}
+                onClick={() => setPaperStyle('ruled')}
+                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                  paperStyle === 'ruled'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                    : 'text-[#675d52]'
+                }`}
               >
-                <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
-                <span className="hidden sm:inline">
-                  {t('notes.fullscreen')}
-                </span>
+                {t('notes.ruled')}
               </button>
-
-              {isSaving && (
-                <span className="font-label-mono text-[10px] text-[#832613] italic animate-pulse">
-                  {isRtl ? 'جارٍ الحفظ...' : 'Preserving...'}
-                </span>
-              )}
-            </div>
-
-            {/* Category & Date Pickers */}
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-xs text-[#080c12] focus:outline-none"
-              />
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-stamp text-[10px] uppercase text-[#832613] focus:outline-none cursor-pointer"
+              <button
+                type="button"
+                onClick={() => setPaperStyle('grid')}
+                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                  paperStyle === 'grid'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                    : 'text-[#675d52]'
+                }`}
               >
-                {categories
-                  .filter((c) => c !== 'All')
-                  .map((cat) => (
-                    <option key={cat} value={cat}>
-                      {t(`notes.categories.${cat}`, cat)}
-                    </option>
-                  ))}
-                {!categories.includes(category) && category !== 'All' && (
-                  <option value={category}>
-                    {t(`notes.categories.${category}`, category)}
-                  </option>
-                )}
-              </select>
+                {t('notes.grid')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaperStyle('blank')}
+                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                  paperStyle === 'blank'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                    : 'text-[#675d52]'
+                }`}
+              >
+                {t('notes.blank')}
+              </button>
             </div>
+
+            {/* Fullscreen Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setIsFolioFullscreen(!isFolioFullscreen)}
+              className={`px-2.5 py-1 rounded text-xs font-label-stamp flex items-center gap-1.5 transition-colors cursor-pointer border shadow-2xs ${
+                isFolioFullscreen
+                  ? 'bg-[#832613] text-white border-[#832613]'
+                  : 'bg-[#f0eee8] hover:bg-[#e5e2dc] text-[#080c12] border-[#dcd8ce]'
+              }`}
+              title={isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+            >
+              {isFolioFullscreen ? (
+                <Minimize2 className="w-3.5 h-3.5" />
+              ) : (
+                <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
+              )}
+              <span className="font-bold">
+                {isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+              </span>
+              {isFolioFullscreen && (
+                <span className="text-[10px] opacity-75 font-mono hidden sm:inline">(Esc)</span>
+              )}
+            </button>
+
+            {isSaving && (
+              <span className="font-label-mono text-[10px] text-[#832613] italic animate-pulse">
+                {isRtl ? 'جارٍ الحفظ...' : 'Preserving...'}
+              </span>
+            )}
           </div>
 
-          {/* Note Title Input */}
-          <div className="mb-2">
+          {/* Category & Date Pickers */}
+          <div className="flex items-center gap-2">
             <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('notes.noteTitlePlaceholder')}
-              className="w-full bg-transparent border-b border-[#e5e2dc] pb-1.5 font-headline-lg text-2xl text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613]"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-xs text-[#080c12] focus:outline-none"
             />
-          </div>
-
-          {/* Voice Notes & Media Attachments Toolbar */}
-          <div className="mb-2 space-y-1.5">
-            <VoiceNoteSection
-              targetType="note"
-              targetId={activeNote.id}
-              onTranscribeText={(text) => {
-                setContent((prev) => (prev ? prev + ' ' + text : text));
-              }}
-            />
-            <ImageAttachmentSection
-              targetType="note"
-              targetId={activeNote.id}
-            />
-          </div>
-
-          {/* Note Manuscript Writing Area (Text or Code) */}
-          <div
-            className="p-3 sm:p-4 rounded-sm min-h-[640px] border border-[#e5e2dc]/60 relative bg-[#fdfbf7] flex-1 flex flex-col shadow-xs"
-          >
-            <CodeOrTextEditor
-              content={content}
-              onChange={setContent}
-              noteType={noteType}
-              onNoteTypeChange={(type) => {
-                setNoteType(type);
-                onUpdateNote(activeNote.id, { noteType: type });
-              }}
-              paperStyle={paperStyle}
-              rows={22}
-              minHeight="580px"
-              placeholder={t('notes.noteContentPlaceholder')}
-            />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-stamp text-[10px] uppercase text-[#832613] focus:outline-none cursor-pointer"
+            >
+              {categories
+                .filter((c) => c !== 'All')
+                .map((cat) => (
+                  <option key={cat} value={cat}>
+                    {t(`notes.categories.${cat}`, cat)}
+                  </option>
+                ))}
+              {!categories.includes(category) && category !== 'All' && (
+                <option value={category}>
+                  {t(`notes.categories.${category}`, category)}
+                </option>
+              )}
+            </select>
           </div>
         </div>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-[#675d52]">
-          <BookOpen className="w-12 h-12 opacity-30 mb-2" />
-          <p className="font-body-script text-base italic">
-            {isRtl ? 'اختر أو دوّن صفحة ملاحظات جديدة لقراءة مخطوطتها.' : 'Select or inscribe a folio note to read its manuscript.'}
-          </p>
+
+        {/* Note Title Input */}
+        <div className="mb-2 shrink-0">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t('notes.noteTitlePlaceholder')}
+            className={`w-full bg-transparent border-b border-[#e5e2dc] pb-1.5 font-headline-lg text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613] ${
+              isFolioFullscreen ? 'text-2xl sm:text-3xl font-bold' : 'text-2xl'
+            }`}
+          />
         </div>
+
+        {/* Voice Notes & Media Attachments Toolbar */}
+        <div className="mb-2 space-y-1.5 shrink-0">
+          <VoiceNoteSection
+            targetType="note"
+            targetId={activeNote.id}
+            onTranscribeText={(text) => {
+              setContent((prev) => (prev ? prev + ' ' + text : text));
+            }}
+          />
+          <ImageAttachmentSection
+            targetType="note"
+            targetId={activeNote.id}
+          />
+        </div>
+
+        {/* Note Manuscript Writing Area (Text or Code) */}
+        <div
+          className={`rounded-sm border border-[#e5e2dc]/60 relative bg-[#fdfbf7] flex-1 flex flex-col shadow-xs ${
+            isFolioFullscreen ? 'p-3 sm:p-6 min-h-[calc(100vh-280px)]' : 'p-3 sm:p-4 min-h-[640px]'
+          }`}
+        >
+          <CodeOrTextEditor
+            key={`editor-${activeNote.id}-${isFolioFullscreen}`}
+            content={content}
+            onChange={setContent}
+            paperStyle={paperStyle}
+            rows={isFolioFullscreen ? 28 : 22}
+            minHeight={isFolioFullscreen ? 'calc(100vh - 320px)' : '580px'}
+            placeholder={t('notes.noteContentPlaceholder')}
+          />
+        </div>
+      </div>
+
+      {!isFolioFullscreen && (
+        <PageFooter side="right" pageNumber={77} subText={t('app.smythsonParis')} />
       )}
-
-      <PageFooter side="right" pageNumber={77} subText={t('app.smythsonParis')} />
     </div>
   );
+
+  if (isFolioFullscreen) {
+    return createPortal(noteElement, document.body);
+  }
+
+  return noteElement;
 };

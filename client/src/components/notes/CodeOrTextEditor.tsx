@@ -25,6 +25,27 @@ import {
 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES } from '../../utils/prismHelper';
 
+const formatContentAsHtml = (text: string): string => {
+  if (!text) return '';
+  if (
+    text.includes('<p>') ||
+    text.includes('<div>') ||
+    text.includes('<pre>') ||
+    text.includes('<h1>') ||
+    text.includes('<h2>') ||
+    text.includes('<h3>') ||
+    text.includes('<ul>') ||
+    text.includes('<ol>') ||
+    text.includes('<code>')
+  ) {
+    return text;
+  }
+  return text
+    .split('\n')
+    .map((line) => (line.trim() ? `<p>${line}</p>` : '<p><br></p>'))
+    .join('');
+};
+
 interface CodeOrTextEditorProps {
   content: string;
   onChange: (value: string) => void;
@@ -91,16 +112,12 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
   useEffect(() => {
     if (richEditorRef.current) {
       if (!isInternalUpdateRef.current) {
-        // If content is purely raw text without tags, convert newlines to <p>
-        let initialHtml = content || '';
-        if (initialHtml && !initialHtml.includes('<p>') && !initialHtml.includes('<div>') && !initialHtml.includes('<pre>')) {
-          initialHtml = initialHtml
-            .split('\n')
-            .map((line) => (line.trim() ? `<p>${line}</p>` : '<p><br></p>'))
-            .join('');
-        }
-        if (richEditorRef.current.innerHTML !== initialHtml) {
-          richEditorRef.current.innerHTML = initialHtml;
+        const expectedHtml = formatContentAsHtml(content);
+        if (
+          richEditorRef.current.innerHTML !== expectedHtml &&
+          richEditorRef.current.innerHTML !== content
+        ) {
+          richEditorRef.current.innerHTML = expectedHtml;
         }
       }
       isInternalUpdateRef.current = false;
@@ -109,10 +126,15 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
 
   const handleRichInput = useCallback(() => {
     if (richEditorRef.current) {
+      const newHtml = richEditorRef.current.innerHTML;
+      // Safety guard against erasing content on spurious empty event
+      if (!newHtml && content && content.trim() !== '') {
+        return;
+      }
       isInternalUpdateRef.current = true;
-      onChange(richEditorRef.current.innerHTML);
+      onChange(newHtml);
     }
-  }, [onChange]);
+  }, [onChange, content]);
 
   // Execute standard formatting commands
   const executeFormat = (command: string, value: string | undefined = undefined) => {
@@ -755,7 +777,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
         onInput={handleRichInput}
         onKeyDown={handleEditorKeyDown}
         onClick={handleEditorClick}
-        onChange={handleEditorChange}
+        dangerouslySetInnerHTML={{ __html: formatContentAsHtml(content) }}
         data-placeholder={placeholder || t('daily.notesPlaceholder')}
         className={`rich-note-editor w-full p-3 sm:p-4 focus:outline-none text-[#080c12] text-base font-body-script flex-1 overflow-y-auto ${
           paperStyle === 'ruled'
