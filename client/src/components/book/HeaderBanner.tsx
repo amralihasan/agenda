@@ -18,6 +18,8 @@ import {
   Calendar,
   Languages,
   BookOpen,
+  LogOut,
+  UserRound,
 } from 'lucide-react';
 import { AgendaSection } from './IndexTabs';
 
@@ -26,6 +28,8 @@ interface HeaderBannerProps {
   onDateChange: (newDate: string) => void;
   onOpenSettings: () => void;
   onLanguageChange: (lang: 'en' | 'ar') => void;
+  userEmail: string;
+  onLogout: () => void;
   activeSection?: AgendaSection;
 }
 
@@ -34,6 +38,8 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
   onDateChange,
   onOpenSettings,
   onLanguageChange,
+  userEmail,
+  onLogout,
   activeSection = 'daily',
 }) => {
   const { t, i18n } = useTranslation();
@@ -149,6 +155,23 @@ export const HeaderBanner: React.FC<HeaderBannerProps> = ({
           >
             <Languages className="w-3.5 h-3.5 text-[#da664d]" />
             <span className="font-semibold">{i18n.language === 'en' ? 'العربية' : 'English'}</span>
+          </button>
+
+          <span
+            className="hidden xl:flex items-center gap-1.5 px-2 py-1 rounded bg-[#380a08]/60 border border-[#da664d]/20 text-[10px] font-label-mono text-[#d2c4b7] max-w-[210px]"
+            title={userEmail}
+          >
+            <UserRound className="w-3 h-3 text-[#da664d] shrink-0" />
+            <span className="truncate" dir="ltr">{userEmail}</span>
+          </span>
+
+          <button
+            type="button"
+            onClick={onLogout}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#380a08]/80 hover:bg-[#6e1e0d] border border-[#da664d]/30 flex items-center justify-center text-[#d2c4b7] hover:text-[#fcf9f3] transition-colors cursor-pointer"
+            title={t('auth.logout')}
+          >
+            <LogOut className="w-4 h-4" />
           </button>
 
           <button

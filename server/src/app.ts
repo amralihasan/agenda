@@ -15,6 +15,8 @@ import { backupRouter } from './routes/backup.routes.js';
 import { voiceNotesRouter } from './routes/voice-notes.routes.js';
 import { imagesRouter } from './routes/images.routes.js';
 import { categoriesRouter } from './routes/categories.routes.js';
+import { authRouter } from './routes/auth.routes.js';
+import { requireAuth } from './middleware/auth.middleware.js';
 
 const candidateDistPaths = [
   path.resolve(process.cwd(), 'client/dist'),
@@ -28,7 +30,14 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// API Routes
+// Public API Routes
+app.use('/api/auth', authRouter);
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// Protected API Routes — every request needs a valid Bearer token
+app.use('/api', requireAuth);
 app.use('/api', agendaRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/priorities', prioritiesRouter);
@@ -42,10 +51,6 @@ app.use('/api/images', imagesRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/backup', backupRouter);
-
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
-});
 
 // Serve frontend static files
 app.use(express.static(clientDist));

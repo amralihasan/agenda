@@ -1,10 +1,26 @@
 import { PrismaClient } from '@prisma/client';
 import { format, addDays, subDays } from 'date-fns';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding Digital Paper Agenda database...');
+
+  // 0. Single application user
+  const defaultEmail = 'eng.amralihassan@gmail.com';
+  const existingUser = await prisma.user.findUnique({
+    where: { email: defaultEmail },
+  });
+  if (!existingUser) {
+    await prisma.user.create({
+      data: {
+        email: defaultEmail,
+        password: await bcrypt.hash('password123', 10),
+        name: 'Amr Al-Hassan',
+      },
+    });
+  }
 
   // 1. Settings
   await prisma.appSettings.upsert({

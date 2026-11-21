@@ -15,6 +15,22 @@
     "smythsonParis": "Archival Heritage Edition",
     "acidFreePaper": "Acid-Free 120 GSM Warm Ivory Paper"
   },
+  "auth": {
+    "eyebrow": "The Executive Agenda",
+    "folioTitle": "Digital Leather-Bound Folio & Journal",
+    "email": "Email address",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "signIn": "Sign in to the agenda",
+    "signingIn": "Signing in...",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "invalidCredentials": "Invalid email or password.",
+    "networkError": "Could not reach the server. Check your connection and try again.",
+    "logout": "Logout",
+    "sessionExpired": "Session expired. Please sign in again.",
+    "checkingSession": "Verifying your session..."
+  },
   "nav": {
     "daily": "DAILY",
     "weekly": "WEEKLY",

@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+export const AuthLoginSchema = z.object({
+  email: z.string().email('Valid email is required'),
+  password: z.string().min(1, 'Password is required'),
+});
+
 export const TaskCreateSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional().nullable(),

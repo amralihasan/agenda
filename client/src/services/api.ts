@@ -9,14 +9,35 @@ import {
   Note,
   WeeklyPlan,
   AppSettings,
+  AuthUser,
 } from '../types';
 
 const API_BASE = '/api';
+const TOKEN_KEY = 'agenda_auth_token';
+
+export function getToken(): string | null {
+  return (
+    localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY)
+  );
+}
+
+export function setToken(token: string, remember = true) {
+  clearToken();
+  const storage = remember ? localStorage : sessionStorage;
+  storage.setItem(TOKEN_KEY, token);
+}
+
+export function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+}
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const token = getToken();
   const res = await fetch(`${API_BASE}${url}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
     ...options,
@@ -24,6 +45,12 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
+    if (res.status === 401 && !url.startsWith('/auth/login')) {
+      clearToken();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('agenda:unauthorized'));
+      }
+    }
     throw new Error(errorBody.error || `HTTP error ${res.status}`);
   }
 
@@ -31,6 +58,17 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Authentication
+  login: (data: { email: string; password: string }) =>
+    fetchJson<{ token: string; user: AuthUser }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getCurrentUser: () =>
+    fetchJson<{ user: AuthUser }>('/auth/me'),
+  logout: () =>
+    fetchJson<{ success: boolean }>('/auth/logout', { method: 'POST' }),
+
   // Agenda
   getDailyAgenda: (date: string) =>
     fetchJson<DailyAgendaResponse>(`/daily-agenda/${date}`),

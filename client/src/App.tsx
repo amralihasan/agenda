@@ -16,7 +16,9 @@ import { NotesVersoPage } from './components/notes/NotesVersoPage';
 import { NotesRectoPage } from './components/notes/NotesRectoPage';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { CategoryManagerDialog } from './components/notes/CategoryManagerDialog';
-import { api } from './services/api';
+import { LoginPage } from './components/auth/LoginPage';
+import { api, clearToken, getToken } from './services/api';
+import { Loader2 } from 'lucide-react';
 import {
   DailyAgendaResponse,
   WeeklyAgendaResponse,
@@ -27,10 +29,14 @@ import {
   Note,
   Category,
   AppSettings,
+  AuthUser,
 } from './types';
 import { setAppLanguage } from './i18n/i18n';
 
-export const App: React.FC = () => {
+const AgendaApp: React.FC<{ user: AuthUser; onLogout: () => void }> = ({
+  user,
+  onLogout,
+}) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
 
@@ -584,6 +590,8 @@ export const App: React.FC = () => {
         onDateChange={setCurrentDate}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onLanguageChange={handleLanguageChange}
+        userEmail={user.email}
+        onLogout={onLogout}
         activeSection={activeSection}
       />
 
@@ -656,4 +664,96 @@ export const App: React.FC = () => {
       />
     </div>
   );
+};
+
+type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated';
+
+export const App: React.FC = () => {
+  const { t } = useTranslation();
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(() =>
+    getToken() ? 'checking' : 'unauthenticated'
+  );
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  // A 401 from any API call drops the session immediately.
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      setSessionExpired(true);
+      setAuthStatus('unauthenticated');
+    };
+    window.addEventListener('agenda:unauthorized', handleUnauthorized);
+    return () =>
+      window.removeEventListener('agenda:unauthorized', handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!getToken()) {
+      setAuthStatus('unauthenticated');
+      return;
+    }
+
+    api
+      .getCurrentUser()
+      .then((result) => {
+        if (cancelled) return;
+        setUser(result.user);
+        setAuthStatus('authenticated');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        clearToken();
+        setUser(null);
+        setSessionExpired(true);
+        setAuthStatus('unauthenticated');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleLoginSuccess = (loggedInUser: AuthUser) => {
+    setUser(loggedInUser);
+    setSessionExpired(false);
+    setAuthStatus('authenticated');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch {
+      // Token may already be invalid; clearing locally is enough.
+    } finally {
+      clearToken();
+      setUser(null);
+      setSessionExpired(false);
+      setAuthStatus('unauthenticated');
+    }
+  };
+
+  if (authStatus === 'checking') {
+    return (
+      <div className="min-h-screen bg-[#1a0302] flex flex-col items-center justify-center gap-3 text-[#c5a059]">
+        <Loader2 className="w-6 h-6 animate-spin" />
+        <span className="font-label-mono text-[11px] uppercase tracking-widest">
+          {t('auth.checkingSession')}
+        </span>
+      </div>
+    );
+  }
+
+  if (authStatus === 'unauthenticated' || !user) {
+    return (
+      <LoginPage
+        onLoginSuccess={handleLoginSuccess}
+        sessionExpired={sessionExpired}
+      />
+    );
+  }
+
+  return <AgendaApp user={user} onLogout={handleLogout} />;
 };

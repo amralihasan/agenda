@@ -87,6 +87,12 @@ else
     echo -e "${GREEN}✔ server/.env found.${NC}"
 fi
 
+# Ensure a JWT signing secret exists (auth sessions survive restarts).
+if ! grep -q '^JWT_SECRET=' server/.env; then
+    printf 'JWT_SECRET="%s"\n' "$(openssl rand -hex 32)" >> server/.env
+    echo -e "${GREEN}✔ JWT_SECRET generated and added to server/.env.${NC}"
+fi
+
 # ------------------------------------------------------------------------------
 # 4. Dependency Installation
 # ------------------------------------------------------------------------------
