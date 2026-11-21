@@ -43,8 +43,8 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
   onNoteTypeChange,
   paperStyle = 'ruled',
   placeholder,
-  minHeight = '240px',
-  rows = 8,
+  minHeight = '480px',
+  rows = 18,
 }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
@@ -186,7 +186,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
             onClick={() => onNoteTypeChange('code')}
             className={`px-2.5 py-1 rounded uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
               noteType === 'code'
-                ? 'bg-[#1e1b18] text-[#da664d] font-bold shadow-2xs'
+                ? 'bg-[#ffffff] text-[#832613] font-bold shadow-2xs border border-[#e5e2dc]'
                 : 'text-[#675d52] hover:text-[#080c12]'
             }`}
           >
@@ -344,16 +344,16 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
 
         {/* Code Mode Top Actions */}
         {noteType === 'code' && (
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             {/* View Mode: Edit vs Syntax Highlighted Preview */}
-            <div className="flex items-center gap-1 bg-[#27272a] p-0.5 rounded text-[10px] font-mono">
+            <div className="flex items-center gap-1 bg-[#f1f5f9] border border-[#e2e8f0] p-0.5 rounded text-[10px] font-mono">
               <button
                 type="button"
                 onClick={() => setCodeViewMode('preview')}
                 className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all cursor-pointer ${
                   codeViewMode === 'preview'
-                    ? 'bg-[#3f3f46] text-[#38bdf8] font-bold'
-                    : 'text-[#a1a1aa] hover:text-[#f4f4f5]'
+                    ? 'bg-white text-[#0284c7] font-bold shadow-2xs border border-[#cbd5e1]'
+                    : 'text-[#64748b] hover:text-[#0f172a]'
                 }`}
                 title={t('daily.highlightMode')}
               >
@@ -365,8 +365,8 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
                 onClick={() => setCodeViewMode('edit')}
                 className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all cursor-pointer ${
                   codeViewMode === 'edit'
-                    ? 'bg-[#3f3f46] text-[#4ade80] font-bold'
-                    : 'text-[#a1a1aa] hover:text-[#f4f4f5]'
+                    ? 'bg-white text-[#16a34a] font-bold shadow-2xs border border-[#cbd5e1]'
+                    : 'text-[#64748b] hover:text-[#0f172a]'
                 }`}
                 title={t('daily.editMode')}
               >
@@ -379,7 +379,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="bg-[#27272a] text-[#f4f4f5] border border-[#3f3f46] rounded px-2 py-0.5 text-xs font-mono focus:outline-none cursor-pointer"
+              className="bg-white text-[#1e293b] border border-[#cbd5e1] rounded px-2.5 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#832613] shadow-2xs cursor-pointer"
             >
               {SUPPORTED_LANGUAGES.map((lang) => (
                 <option key={lang.id} value={lang.id}>
@@ -392,17 +392,17 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
             <button
               type="button"
               onClick={handleCopyCode}
-              className="px-2 py-1 rounded bg-[#27272a] hover:bg-[#3f3f46] text-[#f4f4f5] font-mono text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+              className="px-2.5 py-1 rounded bg-white hover:bg-[#f8fafc] text-[#334155] border border-[#cbd5e1] font-mono text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               title={t('daily.copyCode')}
             >
               {copied ? (
                 <>
-                  <Check className="w-3 h-3 text-[#4ade80]" />
-                  <span className="text-[#4ade80]">{t('daily.codeCopied')}</span>
+                  <Check className="w-3 h-3 text-[#16a34a]" />
+                  <span className="text-[#16a34a] font-semibold">{t('daily.codeCopied')}</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3 h-3 text-[#a1a1aa]" />
+                  <Copy className="w-3 h-3 text-[#64748b]" />
                   <span>{t('daily.copyCode')}</span>
                 </>
               )}
@@ -413,24 +413,24 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
 
       {/* Editor Surface */}
       {noteType === 'code' ? (
-        /* Code Studio Terminal (Strictly LTR layout) */
+        /* Code Studio Terminal (Clean Crisp White Theme) */
         <div
           dir="ltr"
-          className="code-editor rounded-sm border border-[#3f3f46] bg-[#18181b] overflow-hidden shadow-2xl flex flex-col text-left"
+          className="code-editor rounded-sm border border-[#d1d5db] bg-white overflow-hidden shadow-sm flex flex-col text-left flex-1"
         >
           {/* macOS Terminal Window Title Bar */}
-          <div className="bg-[#121214] px-3 py-2 border-b border-[#27272a] flex items-center justify-between text-xs font-mono text-[#a1a1aa] select-none">
+          <div className="bg-[#f8fafc] px-3 py-2 border-b border-[#e2e8f0] flex items-center justify-between text-xs font-mono text-[#64748b] select-none">
             {/* 3 macOS traffic dots on the left */}
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-[#ef4444] inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#f59e0b] inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#10b981] inline-block shadow-sm" />
-              <span className="ml-2 text-xs font-bold text-[#e4e4e7] tracking-wider uppercase">
+              <span className="w-3 h-3 rounded-full bg-[#ef4444] border border-[#dc2626]/40 inline-block shadow-2xs" />
+              <span className="w-3 h-3 rounded-full bg-[#f59e0b] border border-[#d97706]/40 inline-block shadow-2xs" />
+              <span className="w-3 h-3 rounded-full bg-[#10b981] border border-[#059669]/40 inline-block shadow-2xs" />
+              <span className="ml-2 text-xs font-bold text-[#1e293b] tracking-wider uppercase">
                 {SUPPORTED_LANGUAGES.find((l) => l.id === selectedLanguage)?.name || 'CODE'}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] text-[#71717a]">
+            <div className="flex items-center gap-3 text-[11px] text-[#64748b]">
               <span>
                 {lineCount} {t('daily.lines')} · {content.length} {t('daily.chars')}
               </span>
@@ -442,7 +442,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
           {codeViewMode === 'preview' ? (
             /* Syntax Highlighted View */
             <div
-              className="flex relative overflow-hidden bg-[#18181b]"
+              className="flex relative overflow-hidden bg-white flex-1"
               style={{ minHeight }}
               onClick={() => {
                 // Clicking on preview switches to edit mode for fast typing
@@ -452,7 +452,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
               {/* Line Numbers Gutter on LEFT */}
               <div
                 ref={previewGutterRef}
-                className="w-12 bg-[#121214] text-[#71717a] font-mono text-xs select-none py-3 pr-2 text-right overflow-hidden border-r border-[#27272a] shrink-0 pointer-events-none"
+                className="w-12 bg-[#f8fafc] text-[#94a3b8] font-mono text-xs select-none py-3 pr-2 text-right overflow-hidden border-r border-[#e2e8f0] shrink-0 pointer-events-none"
                 style={{ lineHeight: '24px' }}
               >
                 {Array.from({ length: lineCount }).map((_, i) => (
@@ -464,7 +464,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
               <div
                 ref={previewCodeRef}
                 onScroll={handlePreviewScroll}
-                className="flex-1 p-3 overflow-auto font-mono text-xs sm:text-sm whitespace-pre cursor-text"
+                className="flex-1 p-3 overflow-auto font-mono text-xs sm:text-sm whitespace-pre cursor-text text-[#1f2328] bg-white"
                 style={{
                   lineHeight: '24px',
                   minHeight,
@@ -474,7 +474,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
                   dangerouslySetInnerHTML={{
                     __html:
                       highlightedHtml ||
-                      `<span class="text-[#71717a] italic">${
+                      `<span class="text-[#94a3b8] italic">${
                         placeholder || t('daily.codePlaceholder')
                       }</span>`,
                   }}
@@ -483,11 +483,11 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
             </div>
           ) : (
             /* Direct Edit Mode */
-            <div className="flex relative" style={{ minHeight }}>
+            <div className="flex relative bg-white flex-1" style={{ minHeight }}>
               {/* Line Numbers Gutter on LEFT */}
               <div
                 ref={codeGutterRef}
-                className="w-12 bg-[#121214] text-[#71717a] font-mono text-xs select-none py-3 pr-2 text-right overflow-hidden border-r border-[#27272a] shrink-0 pointer-events-none"
+                className="w-12 bg-[#f8fafc] text-[#94a3b8] font-mono text-xs select-none py-3 pr-2 text-right overflow-hidden border-r border-[#e2e8f0] shrink-0 pointer-events-none"
                 style={{ lineHeight: '24px' }}
               >
                 {Array.from({ length: lineCount }).map((_, i) => (
@@ -506,7 +506,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
                 dir="ltr"
                 spellCheck={false}
                 placeholder={placeholder || t('daily.codePlaceholder')}
-                className="flex-1 bg-transparent border-0 p-3 text-[#f4f4f5] font-mono text-xs sm:text-sm focus:outline-none focus:ring-0 resize-y placeholder:text-[#52525b] placeholder:italic"
+                className="flex-1 bg-white border-0 p-3 text-[#1f2328] font-mono text-xs sm:text-sm focus:outline-none focus:ring-0 resize-y placeholder:text-[#94a3b8] placeholder:italic"
                 style={{
                   lineHeight: '24px',
                   tabSize: 2,

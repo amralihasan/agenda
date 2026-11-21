@@ -81,16 +81,20 @@
   letter-spacing: normal !important;
 }
 
-/* Prism Syntax Highlighting Color Palette */
+/* Prism Syntax Highlighting Color Palette - Crisp Light Paper Theme (White Background) */
+.code-editor {
+  background-color: #ffffff !important;
+}
+
 .code-editor .token.comment,
 .code-editor .token.prolog,
 .code-editor .token.doctype,
 .code-editor .token.cdata {
-  color: #71717a !important;
+  color: #6e7781 !important;
   font-style: italic !important;
 }
 .code-editor .token.punctuation {
-  color: #a1a1aa !important;
+  color: #24292f !important;
 }
 .code-editor .token.property,
 .code-editor .token.tag,
@@ -98,41 +102,46 @@
 .code-editor .token.number,
 .code-editor .token.constant,
 .code-editor .token.symbol {
-  color: #fb923c !important;
+  color: #0969da !important;
+  font-weight: 500 !important;
 }
 .code-editor .token.selector,
 .code-editor .token.attr-name,
 .code-editor .token.string,
 .code-editor .token.char,
 .code-editor .token.builtin {
-  color: #4ade80 !important;
+  color: #1a7f37 !important;
 }
-.code-editor .token.operator,
+.code-editor .token.operator {
+  color: #cf222e !important;
+}
 .code-editor .token.entity,
 .code-editor .token.url,
 .code-editor .token.variable,
 .code-editor .token.parameter {
-  color: #38bdf8 !important;
+  color: #bc4c00 !important;
+  font-weight: 500 !important;
 }
 .code-editor .token.atrule,
 .code-editor .token.attr-value,
 .code-editor .token.keyword {
-  color: #c084fc !important;
-  font-weight: 600 !important;
+  color: #832613 !important;
+  font-weight: 700 !important;
 }
 .code-editor .token.function,
 .code-editor .token.class-name {
-  color: #60a5fa !important;
+  color: #8250df !important;
+  font-weight: 600 !important;
 }
 .code-editor .token.regex,
 .code-editor .token.important {
-  color: #fbbf24 !important;
+  color: #9a6700 !important;
 }
 
 /* Rich Text Formatting on Archival Ruled Paper */
 .rich-note-editor {
   outline: none !important;
-  min-height: 220px;
+  min-height: 480px;
 }
 .rich-note-editor h1 {
   font-size: 1.55rem;

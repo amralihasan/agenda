@@ -189,8 +189,8 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
               handleSaveNotesBlur(weeklyNotes, type);
             }}
             paperStyle="ruled"
-            rows={4}
-            minHeight="140px"
+            rows={10}
+            minHeight="280px"
             placeholder={
               isRtl
                 ? 'دوّن الملاحظات الأسبوعية والتفاصيل التنفيذية...'

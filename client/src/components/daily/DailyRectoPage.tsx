@@ -241,7 +241,7 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
           </div>
 
           {/* Auto-saving editor: styled as notebook lines or formatted code terminal */}
-          <div className="relative z-10">
+          <div className="relative z-10 flex-1 flex flex-col">
             <CodeOrTextEditor
               content={noteContent}
               onChange={setNoteContent}
@@ -251,8 +251,8 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
                 onSaveDailyNote(noteContent, type);
               }}
               paperStyle="ruled"
-              rows={8}
-              minHeight="220px"
+              rows={14}
+              minHeight="380px"
               placeholder={t('daily.notesPlaceholder')}
             />
           </div>

@@ -180,7 +180,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
 
           {/* Note Manuscript Writing Area (Text or Code) */}
           <div
-            className="p-3 sm:p-4 rounded-sm min-h-[440px] border border-[#e5e2dc]/40 relative bg-[#fdfbf7]"
+            className="p-3 sm:p-4 rounded-sm min-h-[640px] border border-[#e5e2dc]/60 relative bg-[#fdfbf7] flex-1 flex flex-col shadow-xs"
           >
             <CodeOrTextEditor
               content={content}
@@ -191,8 +191,8 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
                 onUpdateNote(activeNote.id, { noteType: type });
               }}
               paperStyle={paperStyle}
-              rows={15}
-              minHeight="400px"
+              rows={22}
+              minHeight="580px"
               placeholder={t('notes.noteContentPlaceholder')}
             />
           </div>
