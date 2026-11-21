@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Bold,
@@ -322,11 +323,11 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
     }
   };
 
-  return (
+  const editorBody = (
     <div
-      className={`w-full flex flex-col transition-all duration-200 ${
+      className={`w-full flex flex-col transition-all duration-150 ${
         isFullscreen
-          ? 'fixed inset-0 z-[100] w-screen h-screen bg-[#fcf9f3] p-3 sm:p-6 overflow-hidden animate-in fade-in'
+          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-hidden animate-in fade-in shadow-2xl'
           : 'relative'
       }`}
       dir={isRtl ? 'rtl' : 'ltr'}
@@ -770,4 +771,10 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
       />
     </div>
   );
+
+  if (isFullscreen) {
+    return createPortal(editorBody, document.body);
+  }
+
+  return editorBody;
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Maximize2, Minimize2 } from 'lucide-react';
 import { Note } from '../../types';
@@ -92,13 +93,139 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
   }, [title, content, noteType, paperStyle, category, date, activeNote, onUpdateNote]);
 
   return (
-    <div
-      className={`flex-1 flex flex-col justify-between relative select-text transition-all duration-200 ${
-        isFolioFullscreen
-          ? 'fixed inset-0 z-[100] w-screen h-screen bg-[#fcf9f3] p-3 sm:p-6 lg:p-8 overflow-y-auto animate-in fade-in'
-          : ''
-      }`}
-    >
+    <div className="flex-1 flex flex-col justify-between relative select-text">
+      {/* Fullscreen Portal View - Mounted directly to document.body to cover all tabs and ribbons */}
+      {isFolioFullscreen && activeNote &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto animate-in fade-in duration-150"
+            dir={isRtl ? 'rtl' : 'ltr'}
+          >
+            {/* Fullscreen Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-[#e5e2dc] gap-3 shrink-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setIsFolioFullscreen(false)}
+                  className="px-3 py-1.5 rounded bg-[#832613] hover:bg-[#6e1e0d] text-white text-xs font-label-stamp flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                  title={t('notes.exitFullscreen')}
+                >
+                  <Minimize2 className="w-4 h-4" />
+                  <span className="font-bold">{t('notes.exitFullscreen')}</span>
+                  <span className="text-[10px] opacity-80 font-mono hidden sm:inline">(Esc)</span>
+                </button>
+
+                {/* Paper Style Selector */}
+                <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
+                  <button
+                    type="button"
+                    onClick={() => setPaperStyle('ruled')}
+                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
+                      paperStyle === 'ruled'
+                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                        : 'text-[#675d52]'
+                    }`}
+                  >
+                    {t('notes.ruled')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaperStyle('grid')}
+                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
+                      paperStyle === 'grid'
+                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                        : 'text-[#675d52]'
+                    }`}
+                  >
+                    {t('notes.grid')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaperStyle('blank')}
+                    className={`px-2.5 py-1 rounded uppercase tracking-wider ${
+                      paperStyle === 'blank'
+                        ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
+                        : 'text-[#675d52]'
+                    }`}
+                  >
+                    {t('notes.blank')}
+                  </button>
+                </div>
+
+                {isSaving && (
+                  <span className="font-label-mono text-xs text-[#832613] italic animate-pulse">
+                    {isRtl ? 'جارٍ الحفظ...' : 'Preserving...'}
+                  </span>
+                )}
+              </div>
+
+              {/* Category & Date Pickers */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-xs text-[#080c12] focus:outline-none"
+                />
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-stamp text-xs uppercase text-[#832613] focus:outline-none cursor-pointer font-bold"
+                >
+                  {categories
+                    .filter((c) => c !== 'All')
+                    .map((cat) => (
+                      <option key={cat} value={cat}>
+                        {t(`notes.categories.${cat}`, cat)}
+                      </option>
+                    ))}
+                  {!categories.includes(category) && category !== 'All' && (
+                    <option value={category}>
+                      {t(`notes.categories.${category}`, category)}
+                    </option>
+                  )}
+                </select>
+              </div>
+            </div>
+
+            {/* Note Title Input */}
+            <div className="mb-4 shrink-0">
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t('notes.noteTitlePlaceholder')}
+                className="w-full bg-transparent border-b border-[#e5e2dc] pb-2 font-headline-lg text-2xl sm:text-3xl text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613] font-bold"
+              />
+            </div>
+
+            {/* Voice & Image Bar */}
+            <div className="mb-3 shrink-0">
+              <VoiceNoteSection
+                targetType="note"
+                targetId={activeNote.id}
+                onTranscribeText={(text) => {
+                  setContent((prev) => (prev ? prev + ' ' + text : text));
+                }}
+              />
+              <ImageAttachmentSection targetType="note" targetId={activeNote.id} />
+            </div>
+
+            {/* Fullscreen Editor Area */}
+            <div className="flex-1 flex flex-col min-h-0 bg-white/40 rounded p-2 sm:p-4 border border-[#e5e2dc]/60">
+              <CodeOrTextEditor
+                content={content}
+                onChange={setContent}
+                paperStyle={paperStyle}
+                minHeight="calc(100vh - 320px)"
+                placeholder={t('notes.noteContentPlaceholder')}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* Normal In-Spread Note View */}
       {activeNote ? (
         <div className="flex-1 flex flex-col">
           {/* Header Controls for Active Note */}
@@ -144,17 +271,13 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
               {/* Fullscreen Toggle Button */}
               <button
                 type="button"
-                onClick={() => setIsFolioFullscreen(!isFolioFullscreen)}
+                onClick={() => setIsFolioFullscreen(true)}
                 className="px-2 py-1 rounded bg-[#f0eee8] hover:bg-[#e5e2dc] text-[#080c12] text-xs font-label-stamp flex items-center gap-1 transition-colors cursor-pointer border border-[#dcd8ce] shadow-2xs"
-                title={isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+                title={t('notes.fullscreen')}
               >
-                {isFolioFullscreen ? (
-                  <Minimize2 className="w-3.5 h-3.5 text-[#832613]" />
-                ) : (
-                  <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
-                )}
+                <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
                 <span className="hidden sm:inline">
-                  {isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+                  {t('notes.fullscreen')}
                 </span>
               </button>
 
