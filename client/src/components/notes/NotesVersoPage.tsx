@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Plus, Pin, Trash2 } from 'lucide-react';
+import { Search, Plus, Pin, Trash2, Settings2 } from 'lucide-react';
 import { Note } from '../../types';
 import { PageFooter } from '../book/PageFooter';
 
@@ -16,6 +16,7 @@ interface NotesVersoPageProps {
   onCreateNewNote: () => void;
   onTogglePin: (note: Note, e: React.MouseEvent) => void;
   onDeleteNote: (id: string, e: React.MouseEvent) => void;
+  onOpenCategoryManager?: () => void;
 }
 
 export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
@@ -30,6 +31,7 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
   onCreateNewNote,
   onTogglePin,
   onDeleteNote,
+  onOpenCategoryManager,
 }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
@@ -83,12 +85,12 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-1 flex-wrap mb-3 pb-2 border-b border-[#e5e2dc]/60">
+        <div className="flex items-center gap-1.5 flex-wrap mb-3 pb-2 border-b border-[#e5e2dc]/60">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => onCategoryChange(cat)}
-              className={`px-2 py-0.5 rounded text-[10px] font-label-stamp uppercase tracking-wider transition-colors ${
+              className={`px-2 py-0.5 rounded text-[10px] font-label-stamp uppercase tracking-wider transition-colors cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-[#490800] text-[#da664d] font-bold'
                   : 'bg-[#f0eee8] text-[#675d52] hover:bg-[#e5e2dc]'
@@ -97,6 +99,19 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
               {cat === 'All' ? t('notes.categories.all') : t(`notes.categories.${cat}`, cat)}
             </button>
           ))}
+
+          {/* Manage / Add Categories Button */}
+          {onOpenCategoryManager && (
+            <button
+              type="button"
+              onClick={onOpenCategoryManager}
+              className="px-2 py-0.5 rounded text-[10px] font-label-stamp uppercase tracking-wider bg-[#f6f3ed] border border-dashed border-[#832613]/50 text-[#832613] hover:bg-[#832613]/10 flex items-center gap-1 transition-colors cursor-pointer"
+              title={t('categoryManager.manageButton')}
+            >
+              <Settings2 className="w-3 h-3 text-[#832613]" />
+              <span>+ {isRtl ? 'تصنيف جديد / تعديل' : 'Edit / Add'}</span>
+            </button>
+          )}
         </div>
 
         {/* Note List */}

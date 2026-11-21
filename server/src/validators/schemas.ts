@@ -87,3 +87,13 @@ export const ImageAttachmentCreateSchema = z.object({
   targetType: z.enum(['daily', 'weekly', 'note']),
   targetId: z.string().min(1, 'Target ID is required'),
 });
+
+export const CategoryCreateSchema = z.object({
+  name: z.string().min(1, 'Category name is required').trim(),
+  color: z.string().optional().default('#832613'),
+});
+
+export const CategoryUpdateSchema = z.object({
+  name: z.string().min(1).trim().optional(),
+  color: z.string().optional(),
+});

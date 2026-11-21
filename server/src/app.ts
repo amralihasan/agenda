@@ -13,6 +13,7 @@ import { settingsRouter } from './routes/settings.routes.js';
 import { backupRouter } from './routes/backup.routes.js';
 import { voiceNotesRouter } from './routes/voice-notes.routes.js';
 import { imagesRouter } from './routes/images.routes.js';
+import { categoriesRouter } from './routes/categories.routes.js';
 
 const candidateDistPaths = [
   path.resolve(process.cwd(), 'client/dist'),
@@ -36,6 +37,7 @@ app.use('/api/weekly-plan', weeklyRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/voice-notes', voiceNotesRouter);
 app.use('/api/images', imagesRouter);
+app.use('/api/categories', categoriesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/backup', backupRouter);
 

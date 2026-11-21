@@ -113,4 +113,35 @@ describe('Digital Paper Agenda API', () => {
     expect(delRes.status).toBe(200);
     expect(delRes.body.success).toBe(true);
   });
+
+  it('Categories CRUD: GET, POST, PUT, DELETE /api/categories should work', async () => {
+    // 1. GET categories
+    const getRes = await request(app).get('/api/categories');
+    expect(getRes.status).toBe(200);
+    expect(Array.isArray(getRes.body)).toBe(true);
+    expect(getRes.body.length).toBeGreaterThan(0);
+
+    // 2. POST create category
+    const uniqueCatName = `TestCat-${Date.now()}`;
+    const createRes = await request(app).post('/api/categories').send({
+      name: uniqueCatName,
+      color: '#832613',
+    });
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.name).toBe(uniqueCatName);
+    const catId = createRes.body.id;
+
+    // 3. PUT update category
+    const updatedName = `${uniqueCatName}-Updated`;
+    const putRes = await request(app).put(`/api/categories/${catId}`).send({
+      name: updatedName,
+    });
+    expect(putRes.status).toBe(200);
+    expect(putRes.body.name).toBe(updatedName);
+
+    // 4. DELETE category
+    const delRes = await request(app).delete(`/api/categories/${catId}`);
+    expect(delRes.status).toBe(200);
+    expect(delRes.body.success).toBe(true);
+  });
 });

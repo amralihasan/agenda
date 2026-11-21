@@ -171,5 +171,19 @@
     "noImages": "No attached images",
     "count": "Plates / Images",
     "uploadError": "Failed to load or process image."
+  },
+  "categoryManager": {
+    "title": "Folio Categories & Classifications",
+    "subtitle": "Create, edit or remove classification sections",
+    "newCategoryPlaceholder": "New category title...",
+    "addCategory": "Add Category",
+    "editCategory": "Rename",
+    "deleteCategory": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirmDelete": "Are you sure you want to remove this category? Associated notes will be marked as 'General'.",
+    "categoryExists": "A category with this name already exists.",
+    "all": "All Folios",
+    "manageButton": "Categories"
   }
 }

@@ -184,4 +184,21 @@ export const api = {
     fetchJson<{ success: boolean; id: string }>(`/images/${id}`, {
       method: 'DELETE',
     }),
+
+  // Categories
+  getCategories: () => fetchJson<import('../types').Category[]>('/categories'),
+  createCategory: (data: { name: string; color?: string }) =>
+    fetchJson<import('../types').Category>('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateCategory: (id: string, data: { name?: string; color?: string }) =>
+    fetchJson<import('../types').Category>(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteCategory: (id: string) =>
+    fetchJson<{ success: boolean; id: string; name: string }>(`/categories/${id}`, {
+      method: 'DELETE',
+    }),
 };

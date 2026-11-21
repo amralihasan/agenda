@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { HeaderBanner } from './components/book/HeaderBanner';
@@ -15,6 +15,7 @@ import { MonthlyRectoPage } from './components/monthly/MonthlyRectoPage';
 import { NotesVersoPage } from './components/notes/NotesVersoPage';
 import { NotesRectoPage } from './components/notes/NotesRectoPage';
 import { SettingsModal } from './components/settings/SettingsModal';
+import { CategoryManagerDialog } from './components/notes/CategoryManagerDialog';
 import { api } from './services/api';
 import {
   DailyAgendaResponse,
@@ -24,6 +25,7 @@ import {
   DailyPriority,
   ScheduleEvent,
   Note,
+  Category,
   AppSettings,
 } from './types';
 import { setAppLanguage } from './i18n/i18n';
@@ -56,8 +58,10 @@ export const App: React.FC = () => {
   const [isMoveTaskDialogOpen, setIsMoveTaskDialogOpen] = useState(false);
   const [taskToMove, setTaskToMove] = useState<Task | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
 
-  // Initial load: settings & notes
+  // Initial load: settings, notes & categories
   useEffect(() => {
     api.getSettings().then((s) => {
       setSettings(s);
@@ -68,6 +72,7 @@ export const App: React.FC = () => {
     }).catch(console.error);
 
     api.getNotes().then(setNotes).catch(console.error);
+    api.getCategories().then(setCategories).catch(console.error);
   }, []);
 
   // Fetch daily agenda whenever date changes
@@ -323,7 +328,33 @@ export const App: React.FC = () => {
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
   const [notesCategory, setNotesCategory] = useState('All');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const notesCategories = ['All', 'Philosophy', 'Architecture', 'Archive', 'Editorial', 'Personal'];
+
+  const notesCategories = useMemo(() => {
+    const dynamic = categories.map((c) => c.name);
+    return ['All', ...dynamic];
+  }, [categories]);
+
+  const handleCreateCategory = async (name: string) => {
+    const created = await api.createCategory({ name });
+    setCategories((prev) => [...prev, created]);
+  };
+
+  const handleUpdateCategory = async (id: string, name: string) => {
+    const updated = await api.updateCategory(id, { name });
+    setCategories((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    const updatedNotes = await api.getNotes();
+    setNotes(updatedNotes);
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    const res = await api.deleteCategory(id);
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+    if (notesCategory === res.name) {
+      setNotesCategory('All');
+    }
+    const updatedNotes = await api.getNotes();
+    setNotes(updatedNotes);
+  };
 
   const handleCreateNewNoteQuick = async () => {
     const newNote = await handleCreateNote({
@@ -433,6 +464,7 @@ export const App: React.FC = () => {
         onSelectNote={setSelectedNoteId}
         onSearchChange={setNotesSearchQuery}
         onCategoryChange={setNotesCategory}
+        onOpenCategoryManager={() => setIsCategoryManagerOpen(true)}
         onCreateNewNote={handleCreateNewNoteQuick}
         onTogglePin={async (note, e) => {
           e.stopPropagation();
@@ -516,7 +548,18 @@ export const App: React.FC = () => {
         onDataRestored={() => {
           loadDailyAgenda(currentDate);
           api.getNotes().then(setNotes);
+          api.getCategories().then(setCategories);
         }}
+      />
+
+      {/* Category Manager Dialog */}
+      <CategoryManagerDialog
+        isOpen={isCategoryManagerOpen}
+        onClose={() => setIsCategoryManagerOpen(false)}
+        categories={categories}
+        onCreateCategory={handleCreateCategory}
+        onUpdateCategory={handleUpdateCategory}
+        onDeleteCategory={handleDeleteCategory}
       />
     </div>
   );
