@@ -349,12 +349,13 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
     <div
       className={`w-full flex flex-col transition-all duration-150 ${
         isFullscreen
-          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-hidden animate-in fade-in shadow-2xl'
+          ? 'fixed inset-0 z-[99999] w-screen h-screen bg-[#fcf9f3] p-4 sm:p-8 flex flex-col overflow-y-auto animate-in fade-in shadow-2xl'
           : 'relative'
       }`}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      {/* Fullscreen Header Banner when maximized */}
+      <div className={`flex-1 flex flex-col ${isFullscreen ? 'max-w-4xl mx-auto w-full' : 'w-full'}`}>
+        {/* Fullscreen Header Banner when maximized */}
       {isFullscreen && (
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#e5e2dc] shrink-0">
           <div className="flex items-center gap-2">
@@ -791,6 +792,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
           lineHeight: '32px',
         }}
       />
+      </div>
     </div>
   );
 

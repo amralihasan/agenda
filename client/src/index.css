@@ -142,6 +142,8 @@
 .rich-note-editor {
   outline: none !important;
   min-height: 480px;
+  text-align: start !important;
+  line-height: 32px !important;
 }
 .rich-note-editor:empty::before {
   content: attr(data-placeholder);
@@ -154,24 +156,32 @@
   font-size: 1.55rem;
   font-weight: 700;
   color: #080c12;
-  margin: 0.5rem 0 0.25rem 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 48px !important;
   border-bottom: 1px solid rgba(131, 38, 19, 0.25);
-  padding-bottom: 0.15rem;
 }
 .rich-note-editor h2 {
   font-size: 1.3rem;
   font-weight: 700;
   color: #832613;
-  margin: 0.4rem 0 0.2rem 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 40px !important;
 }
 .rich-note-editor h3 {
   font-size: 1.15rem;
   font-weight: 600;
   color: #1c1c18;
-  margin: 0.3rem 0 0.15rem 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 32px !important;
 }
 .rich-note-editor p {
-  margin: 0.2rem 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 32px;
+  line-height: 32px !important;
 }
 .rich-note-editor b,
 .rich-note-editor strong {
@@ -255,17 +265,28 @@
 .rich-note-editor blockquote {
   border-inline-start: 3px solid #832613;
   padding-inline-start: 12px;
-  margin: 6px 0;
+  margin: 0 !important;
+  line-height: 32px !important;
   font-style: italic;
   color: #675d52;
 }
+.rich-note-editor ul,
+.rich-note-editor ol {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 .rich-note-editor ul {
   list-style-type: disc;
-  margin-inline-start: 22px;
+  margin-inline-start: 22px !important;
 }
 .rich-note-editor ol {
   list-style-type: decimal;
-  margin-inline-start: 22px;
+  margin-inline-start: 22px !important;
+}
+.rich-note-editor li {
+  line-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Notebook Ruled Lines (Real Notebook Paper Feel - Aligned with Text Baselines) */

@@ -114,7 +114,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
       }`}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      <div className="flex-1 flex flex-col">
+      <div className={`flex-1 flex flex-col ${isFolioFullscreen ? 'max-w-4xl mx-auto w-full' : 'w-full'}`}>
         {/* Header Controls for Active Note */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-[#e5e2dc] gap-2 shrink-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -245,12 +245,12 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
 
         {/* Note Manuscript Writing Area (Text or Code) */}
         <div
-          className={`rounded-sm border border-[#e5e2dc]/60 relative bg-[#fdfbf7] flex-1 flex flex-col shadow-xs ${
-            isFolioFullscreen ? 'p-3 sm:p-6 min-h-[calc(100vh-280px)]' : 'p-3 sm:p-4 min-h-[640px]'
+          className={`rounded-sm border border-[#e5e2dc]/60 relative bg-[#fdfbf7] flex-1 flex flex-col shadow-xs p-3 sm:p-4 ${
+            isFolioFullscreen ? 'min-h-[calc(100vh-280px)]' : 'min-h-[640px]'
           }`}
         >
           <CodeOrTextEditor
-            key={`editor-${activeNote.id}-${isFolioFullscreen}`}
+            key={`editor-${activeNote.id}`}
             content={content}
             onChange={setContent}
             paperStyle={paperStyle}
