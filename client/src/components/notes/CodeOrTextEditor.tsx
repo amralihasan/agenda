@@ -125,6 +125,21 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
     }
   }, [content]);
 
+  // Toggling fullscreen replaces the editor DOM node, so rehydrate it from the
+  // latest content instead of relying on the initial HTML captured on mount.
+  useEffect(() => {
+    const editor = richEditorRef.current;
+    if (!editor) return;
+
+    const expectedHtml = formatContentAsHtml(content || '');
+    if (editor.innerHTML !== expectedHtml && editor.innerHTML !== content) {
+      editor.innerHTML = expectedHtml;
+    }
+    isInternalUpdateRef.current = false;
+    // `content` is intentionally read at toggle time, not used as a trigger.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFullscreen]);
+
   const handleRichInput = useCallback(() => {
     if (richEditorRef.current) {
       const newHtml = richEditorRef.current.innerHTML;
