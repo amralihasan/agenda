@@ -19,6 +19,22 @@ interface NotesVersoPageProps {
   onOpenCategoryManager?: () => void;
 }
 
+// Helper to strip HTML tags for clean text snippets and searches
+const stripHtml = (html: string) => {
+  if (!html) return '';
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
   notes,
   selectedNoteId,
@@ -39,10 +55,11 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
   const filteredNotes = notes.filter((n) => {
     const matchesCat =
       selectedCategory === 'All' || n.category === selectedCategory;
+    const strippedContent = stripHtml(n.content);
     const matchesSearch =
       searchQuery === '' ||
       n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.content.toLowerCase().includes(searchQuery.toLowerCase());
+      strippedContent.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesSearch;
   });
 
@@ -164,7 +181,7 @@ export const NotesVersoPage: React.FC<NotesVersoPageProps> = ({
                 </div>
 
                 <p className="font-body-script text-xs text-[#675d52] line-clamp-2 mt-1 leading-snug">
-                  {note.content || (isRtl ? 'صفحة مسودة خالية...' : 'Blank folio page...')}
+                  {stripHtml(note.content) || (isRtl ? 'صفحة مسودة خالية...' : 'Blank folio page...')}
                 </p>
 
                 <div className="flex items-center justify-between mt-2 pt-1 border-t border-[#e5e2dc]/40 text-[10px] font-label-mono text-[#675d52]/70">

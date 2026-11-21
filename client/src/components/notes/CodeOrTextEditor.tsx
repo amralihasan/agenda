@@ -68,6 +68,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
   const isRtl = i18n.language === 'ar';
 
   const richEditorRef = useRef<HTMLDivElement | null>(null);
+  const initialHtmlRef = useRef(formatContentAsHtml(content || ''));
   const isInternalUpdateRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -108,19 +109,19 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
     };
   }, [isFullscreen]);
 
-  // Sync content with richEditorRef
+  // Sync content with richEditorRef for external updates (e.g. voice dictation or date navigation)
   useEffect(() => {
-    if (richEditorRef.current) {
-      if (!isInternalUpdateRef.current) {
-        const expectedHtml = formatContentAsHtml(content);
-        if (
-          richEditorRef.current.innerHTML !== expectedHtml &&
-          richEditorRef.current.innerHTML !== content
-        ) {
-          richEditorRef.current.innerHTML = expectedHtml;
-        }
-      }
+    if (!richEditorRef.current) return;
+
+    if (isInternalUpdateRef.current) {
       isInternalUpdateRef.current = false;
+      return;
+    }
+
+    const currentDom = richEditorRef.current.innerHTML;
+    const expectedHtml = formatContentAsHtml(content || '');
+    if (currentDom !== expectedHtml && currentDom !== content) {
+      richEditorRef.current.innerHTML = expectedHtml;
     }
   }, [content]);
 
@@ -778,7 +779,7 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
         onInput={handleRichInput}
         onKeyDown={handleEditorKeyDown}
         onClick={handleEditorClick}
-        dangerouslySetInnerHTML={{ __html: formatContentAsHtml(content) }}
+        dangerouslySetInnerHTML={{ __html: initialHtmlRef.current }}
         data-placeholder={placeholder || t('daily.notesPlaceholder')}
         className={`rich-note-editor w-full px-3 sm:px-4 focus:outline-none text-[#080c12] text-base font-body-script flex-1 overflow-y-auto ${
           paperStyle === 'ruled'

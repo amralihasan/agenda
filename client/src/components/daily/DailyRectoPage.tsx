@@ -243,6 +243,7 @@ export const DailyRectoPage: React.FC<DailyRectoPageProps> = ({
           {/* Auto-saving editor: styled as notebook lines or formatted code terminal */}
           <div className="relative z-10 flex-1 flex flex-col">
             <CodeOrTextEditor
+              key={`daily-editor-${date}`}
               content={noteContent}
               onChange={setNoteContent}
               noteType={noteType}

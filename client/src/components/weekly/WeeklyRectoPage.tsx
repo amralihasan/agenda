@@ -178,6 +178,7 @@ export const WeeklyRectoPage: React.FC<WeeklyRectoPageProps> = ({
           )}
 
           <CodeOrTextEditor
+            key={`weekly-editor-${weeklyData?.weekStartDate || 'default'}`}
             content={weeklyNotes}
             onChange={(val) => {
               setWeeklyNotes(val);
