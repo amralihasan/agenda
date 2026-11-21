@@ -497,9 +497,7 @@ export const App: React.FC = () => {
     rightPageContent = (
       <WeeklyRectoPage
         weeklyData={weeklyData}
-        onOpenDayAgenda={handleOpenDayAgenda}
         onSaveWeeklyPlan={handleSaveWeeklyPlan}
-        onToggleTask={handleToggleTask}
       />
     );
   } else if (activeSection === 'monthly') {

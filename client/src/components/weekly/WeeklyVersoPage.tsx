@@ -104,7 +104,8 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
   };
 
   const days = weeklyData?.days || [];
-  const versoDays = days.slice(0, 3);
+  // All seven days live on this page; the opposite page is reserved for notes.
+  const versoDays = days;
 
   const weekRangeText = weeklyData
     ? `${format(parseISO(weeklyData.weekStartDate), 'd MMM', {
@@ -209,8 +210,8 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
           </div>
         </section>
 
-        {/* Section II: Days 1 to 3 */}
-        <section className="flex flex-col gap-3.5 pt-1">
+        {/* Section II: All seven days of the week */}
+        <section className="flex flex-col gap-2 pt-1">
           {versoDays.map((day) => {
             const isToday = day.date === format(new Date(), 'yyyy-MM-dd');
 
@@ -229,7 +230,9 @@ export const WeeklyVersoPage: React.FC<WeeklyVersoPageProps> = ({
                       {day.dayNumber}
                     </span>
                     <span className="font-caption-caps text-caption-caps text-[#080c12] uppercase tracking-wider font-semibold">
-                      {day.dayName}
+                      {format(parseISO(day.date), 'EEEE', {
+                        locale: isRtl ? ar : enUS,
+                      })}
                     </span>
                   </div>
 
