@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
 import { tasksRouter } from './routes/tasks.routes.js';
 import { prioritiesRouter } from './routes/priorities.routes.js';
 import { eventsRouter } from './routes/events.routes.js';
@@ -11,6 +13,12 @@ import { settingsRouter } from './routes/settings.routes.js';
 import { backupRouter } from './routes/backup.routes.js';
 import { voiceNotesRouter } from './routes/voice-notes.routes.js';
 import { imagesRouter } from './routes/images.routes.js';
+
+const candidateDistPaths = [
+  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(process.cwd(), '../client/dist'),
+];
+const clientDist = candidateDistPaths.find((p) => fs.existsSync(p)) || candidateDistPaths[0];
 
 export const app = express();
 
@@ -33,4 +41,19 @@ app.use('/api/backup', backupRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// Serve frontend static files
+app.use(express.static(clientDist));
+
+// SPA fallback for client-side routing
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  const indexHtml = path.join(clientDist, 'index.html');
+  if (fs.existsSync(indexHtml)) {
+    return res.sendFile(indexHtml);
+  }
+  next();
 });
