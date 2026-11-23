@@ -37,6 +37,7 @@
     "monthly": "شهري",
     "notes": "ملاحظات",
     "search": "بحث",
+    "whiteboard": "السبورة",
     "settings": "إعدادات"
   },
   "daily": {
@@ -297,5 +298,34 @@
       "monthly-memo": "مذكرة شهرية",
       "note": "ملاحظة"
     }
+  },
+  "whiteboard": {
+    "eyebrow": "لوحة الرسم والتخطيط الحر",
+    "newBoard": "لوحة جديدة",
+    "boardTitlePlaceholder": "عنوان اللوحة...",
+    "saving": "جارٍ الحفظ...",
+    "saved": "تم الحفظ",
+    "tools": {
+      "select": "تحديد وتحريك",
+      "pen": "قلم",
+      "highlighter": "تظليل",
+      "line": "خط",
+      "arrow": "سهم",
+      "rect": "مستطيل",
+      "circle": "دائرة",
+      "text": "نص",
+      "sticky": "ملاحظة لاصقة",
+      "eraser": "ممحاة"
+    },
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "clear": "مسح الكل",
+    "exportPng": "تصدير PNG",
+    "deleteBoard": "حذف اللوحة",
+    "bgBlank": "سادة",
+    "bgGrid": "شبكة",
+    "bgRuled": "مسطر",
+    "textPlaceholder": "اكتب هنا...",
+    "stickyPlaceholder": "ملاحظة لاصقة..."
   }
 }

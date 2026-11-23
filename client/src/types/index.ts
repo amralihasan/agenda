@@ -10,6 +10,15 @@ export interface Category {
   color: string;
 }
 
+export interface Whiteboard {
+  id: string;
+  title: string;
+  elements: string;
+  bgStyle: 'blank' | 'grid' | 'ruled';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface SearchResultItem {
   id: string;
   scope: 'daily' | 'monthly' | 'notes';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type AgendaSection = 'daily' | 'weekly' | 'monthly' | 'notes' | 'search';
+export type AgendaSection = 'daily' | 'weekly' | 'monthly' | 'notes' | 'search' | 'whiteboard';
 
 interface IndexTabsProps {
   activeSection: AgendaSection;
@@ -23,6 +23,7 @@ export const IndexTabs: React.FC<IndexTabsProps> = ({
     { id: 'monthly', label: t('nav.monthly') },
     { id: 'notes', label: t('nav.notes') },
     { id: 'search', label: t('nav.search') },
+    { id: 'whiteboard', label: t('nav.whiteboard') },
   ];
 
   if (mobileOnly) {

@@ -270,6 +270,23 @@ export const api = {
       `/search?${sp.toString()}`
     );
   },
+
+  // Whiteboards
+  getWhiteboards: () => fetchJson<import('../types').Whiteboard[]>('/whiteboards'),
+  createWhiteboard: (data: Partial<import('../types').Whiteboard>) =>
+    fetchJson<import('../types').Whiteboard>('/whiteboards', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateWhiteboard: (id: string, data: Partial<import('../types').Whiteboard>) =>
+    fetchJson<import('../types').Whiteboard>(`/whiteboards/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteWhiteboard: (id: string) =>
+    fetchJson<{ success: boolean; id: string }>(`/whiteboards/${id}`, {
+      method: 'DELETE',
+    }),
   updateCategory: (id: string, data: { name?: string; color?: string }) =>
     fetchJson<import('../types').Category>(`/categories/${id}`, {
       method: 'PUT',

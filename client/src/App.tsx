@@ -18,6 +18,7 @@ import { SettingsModal } from './components/settings/SettingsModal';
 import { CategoryManagerDialog } from './components/notes/CategoryManagerDialog';
 import { LoginPage } from './components/auth/LoginPage';
 import { SearchPage } from './components/search/SearchPage';
+import { WhiteboardPage } from './components/whiteboard/WhiteboardPage';
 import { api, clearToken, getToken } from './services/api';
 import { Loader2 } from 'lucide-react';
 import {
@@ -489,6 +490,8 @@ const AgendaApp: React.FC<{ user: AuthUser; onLogout: () => void }> = ({
         }}
       />
     );
+  } else if (activeSection === 'whiteboard') {
+    singlePageContent = <WhiteboardPage />;
   } else if (activeSection === 'daily') {
     leftPageContent = (
       <DailyVersoPage

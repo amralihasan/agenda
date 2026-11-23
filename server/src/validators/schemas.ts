@@ -111,3 +111,11 @@ export const CategoryUpdateSchema = z.object({
   name: z.string().min(1).trim().optional(),
   color: z.string().optional(),
 });
+
+export const WhiteboardCreateSchema = z.object({
+  title: z.string().min(1).default('Sketchpad'),
+  elements: z.string().default('[]'),
+  bgStyle: z.enum(['blank', 'grid', 'ruled']).default('grid'),
+});
+
+export const WhiteboardUpdateSchema = WhiteboardCreateSchema.partial();

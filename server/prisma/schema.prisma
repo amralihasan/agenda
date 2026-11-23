@@ -157,3 +157,12 @@ model ImageAttachment {
 
   @@index([targetType, targetId])
 }
+
+model Whiteboard {
+  id        String   @id @default(cuid())
+  title     String   @default("Sketchpad I")
+  elements  String   @default("[]") // JSON serialized whiteboard elements
+  bgStyle   String   @default("grid") // "blank" | "grid" | "ruled"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

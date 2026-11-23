@@ -37,6 +37,7 @@
     "monthly": "MONTHLY",
     "notes": "NOTES",
     "search": "SEARCH",
+    "whiteboard": "WHITEBOARD",
     "settings": "SETTINGS"
   },
   "daily": {
@@ -297,5 +298,34 @@
       "monthly-memo": "Monthly Memo",
       "note": "Note"
     }
+  },
+  "whiteboard": {
+    "eyebrow": "Studio Sketchpad & Canvas",
+    "newBoard": "New Board",
+    "boardTitlePlaceholder": "Board title...",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "tools": {
+      "select": "Select / Move",
+      "pen": "Pen",
+      "highlighter": "Highlighter",
+      "line": "Line",
+      "arrow": "Arrow",
+      "rect": "Rectangle",
+      "circle": "Circle",
+      "text": "Text",
+      "sticky": "Sticky Note",
+      "eraser": "Eraser"
+    },
+    "undo": "Undo",
+    "redo": "Redo",
+    "clear": "Clear",
+    "exportPng": "Export PNG",
+    "deleteBoard": "Delete Board",
+    "bgBlank": "Blank",
+    "bgGrid": "Grid",
+    "bgRuled": "Ruled",
+    "textPlaceholder": "Type here...",
+    "stickyPlaceholder": "Sticky note..."
   }
 }
