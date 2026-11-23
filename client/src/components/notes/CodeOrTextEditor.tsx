@@ -997,16 +997,16 @@ export const CodeOrTextEditor: React.FC<CodeOrTextEditorProps> = ({
         <span className="w-[1px] h-4 bg-[#e5e2dc] mx-0.5 shrink-0" />
 
         {/* 5. INSERT CODE BLOCK (Jira-style </>) */}
-        <div className="relative">
-          <div className="flex items-center bg-[#ffffff] border border-[#d1d5db] rounded shadow-2xs">
+        <div className="relative shrink-0">
+          <div className="flex items-center bg-[#ffffff] border border-[#d1d5db] rounded shadow-2xs whitespace-nowrap">
             <button
               type="button"
               onClick={() => insertCodeBlock(selectedBlockLang)}
-              className="px-2 py-1 text-xs hover:bg-[#f1f5f9] text-[#832613] font-mono flex items-center gap-1.5 cursor-pointer font-bold transition-colors"
+              className="px-2 py-1 text-xs hover:bg-[#f1f5f9] text-[#832613] font-mono flex items-center gap-1.5 cursor-pointer font-bold transition-colors whitespace-nowrap"
               title={t('daily.insertCodeBlock')}
             >
-              <Code2 className="w-3.5 h-3.5 text-[#832613]" />
-              <span className="hidden sm:inline">{t('daily.insertCodeBlock')}</span>
+              <Code2 className="w-3.5 h-3.5 text-[#832613] shrink-0" />
+              <span className="hidden xl:inline">{t('daily.insertCodeBlock')}</span>
               <span className="text-[10px] bg-[#f1f5f9] px-1 py-0.2 rounded border border-[#e2e8f0]">
                 {selectedBlockLang.toUpperCase()}
               </span>

@@ -195,7 +195,7 @@ export const ImageAttachmentSection: React.FC<ImageAttachmentSectionProps> = ({
 
   return (
     <div
-      className={`w-full my-2 text-[#080c12] ${
+      className={`${compact ? 'contents' : 'w-full my-1.5'} text-[#080c12] ${
         isDragging ? 'ring-2 ring-[#832613] bg-[#832613]/5' : ''
       }`}
       onDragOver={handleDragOver}
@@ -212,7 +212,13 @@ export const ImageAttachmentSection: React.FC<ImageAttachmentSectionProps> = ({
       />
 
       {/* Action Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-1.5 sm:p-2 bg-[#f6f3ed]/70 border border-[#e5e2dc] rounded-sm text-xs">
+      <div
+        className={
+          compact
+            ? 'flex flex-wrap items-center gap-1.5 text-xs'
+            : 'flex flex-wrap items-center justify-between gap-2 p-1.5 bg-[#f6f3ed]/70 border border-[#e5e2dc] rounded-sm text-xs'
+        }
+      >
         {/* Left: Upload Button & Status */}
         <div className="flex items-center gap-2">
           <button

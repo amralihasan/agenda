@@ -362,9 +362,15 @@ export const VoiceNoteSection: React.FC<VoiceNoteSectionProps> = ({
   const hasNotes = voiceNotes.length > 0;
 
   return (
-    <div className="w-full my-2 text-[#080c12]">
+    <div className={compact ? 'contents text-[#080c12]' : 'w-full my-1.5 text-[#080c12]'}>
       {/* Voice Action Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-1.5 sm:p-2 bg-[#f6f3ed]/70 border border-[#e5e2dc] rounded-sm text-xs">
+      <div
+        className={
+          compact
+            ? 'flex flex-wrap items-center gap-1.5 text-xs'
+            : 'flex flex-wrap items-center justify-between gap-2 p-1.5 bg-[#f6f3ed]/70 border border-[#e5e2dc] rounded-sm text-xs'
+        }
+      >
         {/* Left Side: Buttons & Indicators */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Audio Recording Toggle */}

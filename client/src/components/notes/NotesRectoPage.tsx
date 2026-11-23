@@ -116,17 +116,17 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
     >
       <div className={`flex-1 flex flex-col ${isFolioFullscreen ? 'max-w-4xl mx-auto w-full' : 'w-full'}`}>
         {/* Header Controls for Active Note */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 mb-3 border-b border-[#e5e2dc] gap-2 shrink-0">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-between flex-wrap pb-2 mb-2 border-b border-[#e5e2dc] gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {/* Paper Style Selector */}
-            <div className="flex items-center gap-1 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
+            <div className="flex items-center gap-0.5 bg-[#f0eee8] p-0.5 rounded text-[10px] font-label-stamp">
               <button
                 type="button"
                 onClick={() => setPaperStyle('ruled')}
-                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                className={`px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap cursor-pointer ${
                   paperStyle === 'ruled'
-                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                    : 'text-[#675d52]'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-2xs'
+                    : 'text-[#675d52] hover:text-[#080c12]'
                 }`}
               >
                 {t('notes.ruled')}
@@ -134,10 +134,10 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
               <button
                 type="button"
                 onClick={() => setPaperStyle('grid')}
-                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                className={`px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap cursor-pointer ${
                   paperStyle === 'grid'
-                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                    : 'text-[#675d52]'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-2xs'
+                    : 'text-[#675d52] hover:text-[#080c12]'
                 }`}
               >
                 {t('notes.grid')}
@@ -145,54 +145,51 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
               <button
                 type="button"
                 onClick={() => setPaperStyle('blank')}
-                className={`px-2 py-0.5 rounded uppercase tracking-wider ${
+                className={`px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap cursor-pointer ${
                   paperStyle === 'blank'
-                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-sm'
-                    : 'text-[#675d52]'
+                    ? 'bg-[#fcf9f3] text-[#832613] font-bold shadow-2xs'
+                    : 'text-[#675d52] hover:text-[#080c12]'
                 }`}
               >
                 {t('notes.blank')}
               </button>
             </div>
 
-            {/* Fullscreen Toggle Button */}
+            {/* Compact Fullscreen Toggle Button */}
             <button
               type="button"
               onClick={() => setIsFolioFullscreen(!isFolioFullscreen)}
-              className={`px-2.5 py-1 rounded text-xs font-label-stamp flex items-center gap-1.5 transition-colors cursor-pointer border shadow-2xs ${
+              className={`p-1 rounded text-xs font-label-stamp flex items-center gap-1 transition-colors cursor-pointer border ${
                 isFolioFullscreen
-                  ? 'bg-[#832613] text-white border-[#832613]'
+                  ? 'bg-[#832613] text-white border-[#832613] px-2'
                   : 'bg-[#f0eee8] hover:bg-[#e5e2dc] text-[#080c12] border-[#dcd8ce]'
               }`}
-              title={isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
+              title={isFolioFullscreen ? `${t('notes.exitFullscreen')} (Esc)` : t('notes.fullscreen')}
             >
               {isFolioFullscreen ? (
-                <Minimize2 className="w-3.5 h-3.5" />
+                <>
+                  <Minimize2 className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-bold">{t('notes.exitFullscreen')}</span>
+                </>
               ) : (
                 <Maximize2 className="w-3.5 h-3.5 text-[#832613]" />
-              )}
-              <span className="font-bold">
-                {isFolioFullscreen ? t('notes.exitFullscreen') : t('notes.fullscreen')}
-              </span>
-              {isFolioFullscreen && (
-                <span className="text-[10px] opacity-75 font-mono hidden sm:inline">(Esc)</span>
               )}
             </button>
 
             {isSaving && (
-              <span className="font-label-mono text-[10px] text-[#832613] italic animate-pulse">
+              <span className="font-label-mono text-[10px] text-[#832613] italic animate-pulse whitespace-nowrap">
                 {isRtl ? 'جارٍ الحفظ...' : 'Preserving...'}
               </span>
             )}
           </div>
 
           {/* Category & Date Pickers */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-xs text-[#080c12] focus:outline-none"
+              className="bg-transparent border-b border-[#76777c]/40 pb-0.5 font-label-mono text-[11px] text-[#080c12] focus:outline-none"
             />
             <select
               value={category}
@@ -222,17 +219,18 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t('notes.noteTitlePlaceholder')}
-            className={`w-full bg-transparent border-b border-[#e5e2dc] pb-1.5 font-headline-lg text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613] ${
-              isFolioFullscreen ? 'text-2xl sm:text-3xl font-bold' : 'text-2xl'
+            className={`w-full bg-transparent border-b border-[#e5e2dc] pb-1 font-headline-lg text-[#080c12] placeholder:text-[#675d52]/40 focus:outline-none focus:border-[#832613] ${
+              isFolioFullscreen ? 'text-2xl sm:text-3xl font-bold' : 'text-xl'
             }`}
           />
         </div>
 
-        {/* Voice Notes & Media Attachments Toolbar */}
-        <div className="mb-2 space-y-1.5 shrink-0">
+        {/* Voice Notes & Media Attachments Compact Toolbar */}
+        <div className="mb-2 flex flex-wrap items-center gap-1.5 px-2 py-1 bg-[#f6f3ed]/60 border border-[#e5e2dc] rounded-sm shrink-0">
           <VoiceNoteSection
             targetType="note"
             targetId={activeNote.id}
+            compact
             onTranscribeText={(text) => {
               setContent((prev) => (prev ? prev + ' ' + text : text));
             }}
@@ -240,6 +238,7 @@ export const NotesRectoPage: React.FC<NotesRectoPageProps> = ({
           <ImageAttachmentSection
             targetType="note"
             targetId={activeNote.id}
+            compact
           />
         </div>
 
