@@ -335,76 +335,167 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
             ></div>
 
             {/* Schedule Row Items sitting directly on horizontal rules */}
-            <div className="divide-y divide-[#e5e2dc]/80 text-[#1c1c18]">
-              {hours.map((hour) => {
-                // Find events matching this hour
-                const hourPrefix = hour.slice(0, 2);
-                const matchingEvents = events.filter((e) =>
-                  e.startTime.startsWith(hourPrefix)
-                );
+            {(() => {
+              const ROW_HEIGHT = 36;
+              const gridStartMin = startHour * 60;
+              const gridEndMin = (endHour + 1) * 60;
 
-                return (
-                  <div
-                    key={hour}
-                    className="min-h-[29px] py-1 flex items-baseline justify-between group hover:bg-[#f6f3ed]/60 transition-colors"
-                  >
-                    {/* Time Label on margin */}
-                    <span
-                      className={`font-label-mono text-[11px] text-[#675d52] ${
-                        isRtl
-                          ? '-mr-11 sm:-mr-14 w-10 sm:w-13 text-left pl-2'
-                          : '-ml-11 sm:-ml-14 w-10 sm:w-13 text-right pr-2'
-                      } shrink-0 select-none`}
-                    >
-                      {hour}
-                    </span>
+              const toMinutes = (tStr: string) => {
+                const [hh, mm] = tStr.split(':').map((n) => parseInt(n, 10));
+                return (Number.isFinite(hh) ? hh : 0) * 60 + (Number.isFinite(mm) ? mm : 0);
+              };
 
-                    {/* Content on feint line */}
-                    <div className="flex-1 px-2 font-body-script text-base flex flex-col gap-0.5">
-                      {matchingEvents.length > 0 ? (
-                        matchingEvents.map((ev) => (
-                          <div
-                            key={ev.id}
-                            onClick={() => onEditEventClick(ev)}
-                            className="flex items-baseline justify-between cursor-pointer group/ev py-0.5 hover:text-[#832613]"
-                          >
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                              <span className="text-[#080c12] font-medium">
-                                {ev.title}
-                              </span>
-                              {ev.description && (
-                                <span className="text-[#675d52] italic text-xs">
-                                  ({ev.description})
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {ev.category && (
-                                <span className="font-label-mono text-[10px] text-[#832613] shrink-0">
-                                  {ev.category}
-                                </span>
-                              )}
-                              <span className="font-label-mono text-[10px] text-[#675d52] opacity-60">
-                                {ev.startTime}–{ev.endTime}
-                              </span>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => onAddEventClick(hour)}
-                          className="text-left w-full h-full min-h-[20px] opacity-0 group-hover:opacity-100 flex items-center gap-1.5 text-xs text-[#675d52]/60 italic font-body-script hover:text-[#832613] transition-opacity"
+              // Prepare positioned events within the visible schedule range
+              const positionedEvents = events
+                .map((ev) => {
+                  const rawStart = toMinutes(ev.startTime);
+                  const rawEnd = toMinutes(ev.endTime);
+                  const start = Math.max(rawStart, gridStartMin);
+                  const end = Math.min(Math.max(rawEnd, start + 30), gridEndMin);
+                  return { ev, start, end };
+                })
+                .filter(({ start, end }) => end > start && start < gridEndMin && end > gridStartMin)
+                .sort((a, b) => a.start - b.start || b.end - a.end);
+
+              // Simple overlap column layout
+              const laidOutEvents: Array<{
+                ev: ScheduleEvent;
+                start: number;
+                end: number;
+                col: number;
+                totalCols: number;
+              }> = [];
+
+              let group: typeof positionedEvents = [];
+              let groupEnd = -1;
+
+              const flushGroup = () => {
+                if (group.length === 0) return;
+                const colEnds: number[] = [];
+                const assigned = group.map((item) => {
+                  let col = colEnds.findIndex((cEnd) => cEnd <= item.start);
+                  if (col === -1) {
+                    col = colEnds.length;
+                    colEnds.push(item.end);
+                  } else {
+                    colEnds[col] = item.end;
+                  }
+                  return { ...item, col };
+                });
+                const totalCols = Math.max(1, colEnds.length);
+                assigned.forEach((a) => laidOutEvents.push({ ...a, totalCols }));
+                group = [];
+                groupEnd = -1;
+              };
+
+              for (const item of positionedEvents) {
+                if (group.length > 0 && item.start >= groupEnd) {
+                  flushGroup();
+                }
+                group.push(item);
+                groupEnd = Math.max(groupEnd, item.end);
+              }
+              flushGroup();
+
+              return (
+                <div className="relative">
+                  {/* Hour Grid Rows */}
+                  <div className="divide-y divide-[#e5e2dc]/80 text-[#1c1c18]">
+                    {hours.map((hour) => {
+                      const slotHour = parseInt(hour.slice(0, 2), 10);
+                      const slotStart = slotHour * 60;
+                      const slotEnd = (slotHour + 1) * 60;
+                      const isOccupied = laidOutEvents.some(
+                        (item) => item.start < slotEnd && item.end > slotStart
+                      );
+
+                      return (
+                        <div
+                          key={hour}
+                          style={{ height: `${ROW_HEIGHT}px` }}
+                          className="flex items-center justify-between group hover:bg-[#f6f3ed]/60 transition-colors"
                         >
-                          <Plus className="w-3 h-3 text-[#832613]/70" />
-                          <span>{t('daily.addEventPrompt')}</span>
-                        </button>
-                      )}
-                    </div>
+                          {/* Time Label on margin */}
+                          <span
+                            className={`font-label-mono text-[11px] ${
+                              isOccupied ? 'text-[#832613] font-bold' : 'text-[#675d52]'
+                            } ${
+                              isRtl
+                                ? '-mr-11 sm:-mr-14 w-10 sm:w-13 text-left pl-2'
+                                : '-ml-11 sm:-ml-14 w-10 sm:w-13 text-right pr-2'
+                            } shrink-0 select-none`}
+                          >
+                            {hour}
+                          </span>
+
+                          {/* Clickable empty slot */}
+                          <div className="flex-1 h-full px-2 flex items-center">
+                            {!isOccupied && (
+                              <button
+                                type="button"
+                                onClick={() => onAddEventClick(hour)}
+                                className="text-left rtl:text-right w-full h-full opacity-0 group-hover:opacity-100 flex items-center gap-1.5 text-xs text-[#675d52]/60 italic font-body-script hover:text-[#832613] transition-opacity cursor-pointer"
+                              >
+                                <Plus className="w-3 h-3 text-[#832613]/70 shrink-0" />
+                                <span className="truncate">{t('daily.addEventPrompt')}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Spanning Event Selection Blocks */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {laidOutEvents.map(({ ev, start, end, col, totalCols }) => {
+                      const topPx = ((start - gridStartMin) / 60) * ROW_HEIGHT + 2;
+                      const heightPx = Math.max(((end - start) / 60) * ROW_HEIGHT - 4, 24);
+                      const widthPct = 100 / totalCols;
+                      const startPct = col * widthPct;
+
+                      return (
+                        <div
+                          key={ev.id}
+                          onClick={() => onEditEventClick(ev)}
+                          style={{
+                            top: `${topPx}px`,
+                            height: `${heightPx}px`,
+                            [isRtl ? 'right' : 'left']: `calc(${startPct}% + 6px)`,
+                            width: `calc(${widthPct}% - 12px)`,
+                          }}
+                          className={`pointer-events-auto absolute rounded-sm bg-[#832613]/[0.07] hover:bg-[#832613]/[0.13] ${
+                            isRtl ? 'border-r-[3px]' : 'border-l-[3px]'
+                          } border-[#832613] px-3.5 flex items-center justify-between gap-2 cursor-pointer transition-colors shadow-2xs overflow-hidden`}
+                        >
+                          <div className="flex items-baseline gap-2 min-w-0 font-body-script text-base">
+                            <span className="text-[#080c12] font-medium truncate">
+                              {ev.title}
+                            </span>
+                            {ev.description && (
+                              <span className="text-[#675d52] italic text-xs truncate hidden sm:inline">
+                                ({ev.description})
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {ev.category && (
+                              <span className="font-label-mono text-[10px] text-[#832613]">
+                                {ev.category}
+                              </span>
+                            )}
+                            <span className="font-label-mono text-[10px] text-[#832613]/85 whitespace-nowrap">
+                              {ev.startTime}–{ev.endTime}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </section>
       </div>
