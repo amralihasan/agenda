@@ -341,7 +341,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
 
             {/* Schedule Row Items sitting directly on horizontal rules */}
             {(() => {
-              const SLOT_HEIGHT = 34; // 34px per 30-min slot (68px per hour)
+              const SLOT_HEIGHT = 40; // 40px per 30-min slot (80px per hour)
               const gridStartMin = startHour * 60;
               const gridEndMin = endHour * 60 + 30;
 
@@ -493,14 +493,26 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                           }}
                           className={`pointer-events-auto absolute rounded-sm ${
                             isRtl ? 'border-r-[3px]' : 'border-l-[3px]'
-                          } px-3.5 py-1 flex items-center justify-between gap-3 cursor-pointer transition-colors shadow-2xs`}
+                          } px-3.5 py-0.5 flex items-center justify-between gap-3 cursor-pointer transition-colors shadow-2xs overflow-hidden`}
                         >
-                          <div className="flex flex-col justify-center min-w-0 font-body-script leading-snug">
-                            <span className="text-[#080c12] font-medium text-sm sm:text-base whitespace-normal break-words">
+                          <div className="flex flex-col justify-center min-w-0 font-body-script leading-tight">
+                            <span
+                              className={`text-[#080c12] font-medium text-sm sm:text-base ${
+                                heightPx < 44 && ev.description
+                                  ? 'truncate'
+                                  : 'whitespace-normal break-words'
+                              }`}
+                            >
                               {ev.title}
                             </span>
                             {ev.description && (
-                              <span className="text-[#675d52] italic text-xs whitespace-normal break-words">
+                              <span
+                                className={`text-[#675d52] italic text-xs ${
+                                  heightPx < 64
+                                    ? 'truncate'
+                                    : 'whitespace-normal break-words'
+                                }`}
+                              >
                                 {ev.description}
                               </span>
                             )}
