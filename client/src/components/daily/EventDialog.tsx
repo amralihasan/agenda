@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
-import { Calendar, Clock, Tag, Trash2, X } from 'lucide-react';
+import { Calendar, Check, Clock, Tag, Trash2, X } from 'lucide-react';
 import { ScheduleEvent } from '../../types';
+import { EVENT_COLOR_PRESETS } from '../../utils/eventColors';
 
 interface EventDialogProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const EventDialog: React.FC<EventDialogProps> = ({
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('10:00');
   const [category, setCategory] = useState('');
+  const [color, setColor] = useState<string>('carmine');
   const [loading, setLoading] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement | null>(null);
@@ -42,6 +44,7 @@ export const EventDialog: React.FC<EventDialogProps> = ({
     setStartTime(initialEvent?.startTime || '09:00');
     setEndTime(initialEvent?.endTime || '10:00');
     setCategory(initialEvent?.category || '');
+    setColor(initialEvent?.color || 'carmine');
 
     const timer = setTimeout(() => {
       titleInputRef.current?.focus();
@@ -88,6 +91,7 @@ export const EventDialog: React.FC<EventDialogProps> = ({
         startTime,
         endTime,
         category: category.trim() || null,
+        color,
       });
       onClose();
     } catch (err) {
@@ -196,19 +200,51 @@ export const EventDialog: React.FC<EventDialogProps> = ({
             </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="flex items-center gap-1.5 font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
-              <Tag className="w-3 h-3" />
-              <span>{t('dialogs.eventCategoryLabel')}</span>
-            </label>
-            <input
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder={t('dialogs.eventCategoryPlaceholder')}
-              className="w-full bg-white/80 border border-[#dcdad4] rounded-sm px-3 py-1.5 font-body-md text-sm text-[#080c12] placeholder:text-[#675d52]/45 focus:outline-none focus:border-[#832613] transition-colors"
-            />
+          {/* Category & Color */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+            <div>
+              <label className="flex items-center gap-1.5 font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
+                <Tag className="w-3 h-3" />
+                <span>{t('dialogs.eventCategoryLabel')}</span>
+              </label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder={t('dialogs.eventCategoryPlaceholder')}
+                className="w-full bg-white/80 border border-[#dcdad4] rounded-sm px-3 py-1.5 font-body-md text-sm text-[#080c12] placeholder:text-[#675d52]/45 focus:outline-none focus:border-[#832613] transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
+                {t('dialogs.eventColorLabel')}
+              </label>
+              <div className="flex items-center gap-2 py-1">
+                {EVENT_COLOR_PRESETS.map((preset) => {
+                  const isSelected = color === preset.id;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => setColor(preset.id)}
+                      title={isRtl ? preset.labelAr : preset.labelEn}
+                      style={{
+                        backgroundColor: preset.accent,
+                        boxShadow: isSelected
+                          ? `0 0 0 2px #fcf9f3, 0 0 0 4px ${preset.accent}`
+                          : undefined,
+                      }}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-transform cursor-pointer ${
+                        isSelected ? 'scale-110' : 'opacity-80 hover:opacity-100 hover:scale-105'
+                      }`}
+                    >
+                      {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[2.5]" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Notes */}

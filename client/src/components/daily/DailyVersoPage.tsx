@@ -5,6 +5,7 @@ import { ar, enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3, Check, X } from 'lucide-react';
 import { DailyPriority, ScheduleEvent } from '../../types';
 import { PageFooter } from '../book/PageFooter';
+import { getEventColorPreset } from '../../utils/eventColors';
 
 interface DailyVersoPageProps {
   date: string; // YYYY-MM-DD
@@ -456,6 +457,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                       const heightPx = Math.max(((end - start) / 60) * ROW_HEIGHT - 4, 24);
                       const widthPct = 100 / totalCols;
                       const startPct = col * widthPct;
+                      const preset = getEventColorPreset(ev.color);
 
                       return (
                         <div
@@ -466,29 +468,43 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                             height: `${heightPx}px`,
                             [isRtl ? 'right' : 'left']: `calc(${startPct}% + 6px)`,
                             width: `calc(${widthPct}% - 12px)`,
+                            backgroundColor: preset.bg,
+                            borderColor: preset.accent,
                           }}
-                          className={`pointer-events-auto absolute rounded-sm bg-[#832613]/[0.07] hover:bg-[#832613]/[0.13] ${
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = preset.hoverBg;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = preset.bg;
+                          }}
+                          className={`pointer-events-auto absolute rounded-sm ${
                             isRtl ? 'border-r-[3px]' : 'border-l-[3px]'
-                          } border-[#832613] px-3.5 flex items-center justify-between gap-2 cursor-pointer transition-colors shadow-2xs overflow-hidden`}
+                          } px-3.5 flex items-center justify-between gap-2 cursor-pointer transition-colors shadow-2xs overflow-hidden`}
                         >
-                          <div className="flex items-baseline gap-2 min-w-0 font-body-script text-base">
-                            <span className="text-[#080c12] font-medium truncate">
+                          <div className="flex flex-col justify-center min-w-0 font-body-script leading-tight">
+                            <span className="text-[#080c12] font-medium text-sm sm:text-base truncate">
                               {ev.title}
                             </span>
                             {ev.description && (
-                              <span className="text-[#675d52] italic text-xs truncate hidden sm:inline">
-                                ({ev.description})
+                              <span className="text-[#675d52] italic text-xs truncate">
+                                {ev.description}
                               </span>
                             )}
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
                             {ev.category && (
-                              <span className="font-label-mono text-[10px] text-[#832613]">
+                              <span
+                                className="font-label-mono text-[10px]"
+                                style={{ color: preset.accent }}
+                              >
                                 {ev.category}
                               </span>
                             )}
-                            <span className="font-label-mono text-[10px] text-[#832613]/85 whitespace-nowrap">
+                            <span
+                              className="font-label-mono text-[10px] whitespace-nowrap opacity-85"
+                              style={{ color: preset.accent }}
+                            >
                               {ev.startTime}–{ev.endTime}
                             </span>
                           </div>

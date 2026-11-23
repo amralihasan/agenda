@@ -42,6 +42,7 @@ export const ScheduleEventCreateSchema = z.object({
   endTime: z.string().regex(/^\d{2}:\d{2}$/, 'End time must be HH:mm'),
   location: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
 });
 
 export const ScheduleEventUpdateSchema = ScheduleEventCreateSchema.partial();

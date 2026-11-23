@@ -194,6 +194,7 @@
     "eventLocationLabel": "Location",
     "eventCategoryLabel": "Category / Tag",
     "eventCategoryPlaceholder": "e.g. Work, Personal, Meeting...",
+    "eventColorLabel": "Color",
     "eventDescriptionLabel": "Notes",
     "eventDescriptionPlaceholder": "Add details or notes...",
     "save": "Save",

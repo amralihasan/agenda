@@ -194,6 +194,7 @@
     "eventLocationLabel": "المكان",
     "eventCategoryLabel": "التصنيف / الوسم",
     "eventCategoryPlaceholder": "مثال: عمل، شخصي، اجتماع...",
+    "eventColorLabel": "اللون",
     "eventDescriptionLabel": "ملاحظات",
     "eventDescriptionPlaceholder": "أضف تفاصيل أو ملاحظات...",
     "save": "حفظ",

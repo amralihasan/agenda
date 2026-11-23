@@ -45,6 +45,7 @@ export interface ScheduleEvent {
   endTime: string; // HH:mm
   location?: string | null;
   category?: string | null;
+  color?: string | null;
 }
 
 export interface DailyNote {

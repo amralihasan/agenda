@@ -58,6 +58,7 @@ model ScheduleEvent {
   endTime     String   // Format: HH:mm (e.g. "10:30")
   location    String?
   category    String?  // e.g. "Atelier", "Salle I", "M. de R."
+  color       String?  @default("carmine")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
