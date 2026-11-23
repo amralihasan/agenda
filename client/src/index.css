@@ -147,6 +147,21 @@
   padding-top: 16px !important;
   padding-bottom: 32px !important;
 }
+html:not([dir="rtl"]) .font-body-script,
+html:not([dir="rtl"]) .rich-note-editor,
+html:not([dir="rtl"]) .rich-note-editor *:not(code):not(pre):not(.embedded-code-block):not(.embedded-code-block *) {
+  font-family: 'Coming Soon', cursive;
+  font-weight: 600;
+  -webkit-text-stroke: 0.35px currentColor;
+}
+html:not([dir="rtl"]) .rich-note-editor b,
+html:not([dir="rtl"]) .rich-note-editor strong {
+  font-weight: 700;
+  -webkit-text-stroke: 0.65px currentColor;
+}
+html:not([dir="rtl"]) .rich-note-editor {
+  font-size: 1.05rem;
+}
 .rich-note-editor:empty::before {
   content: attr(data-placeholder);
   color: #94a3b8;
