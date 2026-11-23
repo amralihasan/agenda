@@ -6,8 +6,9 @@ import { IndexTabs, AgendaSection } from './IndexTabs';
 interface AgendaBookSpreadProps {
   activeSection: AgendaSection;
   onSelectSection: (section: AgendaSection) => void;
-  leftPage: React.ReactNode;
-  rightPage: React.ReactNode;
+  leftPage?: React.ReactNode;
+  rightPage?: React.ReactNode;
+  singlePage?: React.ReactNode;
   mobilePage?: 'left' | 'right';
   onMobilePageChange?: (page: 'left' | 'right') => void;
 }
@@ -17,6 +18,7 @@ export const AgendaBookSpread: React.FC<AgendaBookSpreadProps> = ({
   onSelectSection,
   leftPage,
   rightPage,
+  singlePage,
   mobilePage: externalMobilePage,
   onMobilePageChange,
 }) => {
@@ -45,6 +47,7 @@ export const AgendaBookSpread: React.FC<AgendaBookSpreadProps> = ({
         />
 
         {/* Mobile Page Toggle (Verso / Recto) */}
+        {!singlePage && (
         <div className="flex items-center justify-between w-full bg-[#2d0705] border border-[#490800] p-1 rounded shadow-md">
           <button
             onClick={() => setMobilePage('left')}
@@ -77,12 +80,13 @@ export const AgendaBookSpread: React.FC<AgendaBookSpreadProps> = ({
             </span>
           </button>
         </div>
+        )}
       </div>
 
       {/* Main Bound Volume Spread */}
       <div className="relative w-full bg-[#fcf9f3] rounded-sm sm:rounded-md shadow-book flex flex-col min-h-[780px] lg:min-h-[820px] border border-[#e5e2dc]/60">
         {/* Spine & Center Ribbon (Desktop) */}
-        <BookSpine />
+        {!singlePage && <BookSpine />}
 
         {/* Die-Cut Navigation Tabs (Desktop) */}
         <IndexTabs
@@ -91,30 +95,34 @@ export const AgendaBookSpread: React.FC<AgendaBookSpreadProps> = ({
         />
 
         {/* Folio Pages Content */}
-        <div className="w-full flex-1 relative z-20">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x lg:divide-[#e5e2dc]/40 relative">
-            {/* Left Page (Verso in LTR) */}
-            <div
-              className={`w-full min-h-[740px] flex flex-col justify-between p-3 sm:p-6 lg:p-10 ${
-                isRtl ? 'lg:pl-10 lg:pr-12' : 'lg:pr-10 lg:pl-12'
-              } bg-[#fcf9f3] ${
-                mobilePage === 'left' ? 'block' : 'hidden lg:flex'
-              }`}
-            >
-              {leftPage}
-            </div>
+        <div className="w-full flex-1 relative z-20 flex flex-col">
+          {singlePage ? (
+            singlePage
+          ) : (
+            <div className="w-full grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x lg:divide-[#e5e2dc]/40 relative">
+              {/* Left Page (Verso in LTR) */}
+              <div
+                className={`w-full min-h-[740px] flex flex-col justify-between p-3 sm:p-6 lg:p-10 ${
+                  isRtl ? 'lg:pl-10 lg:pr-12' : 'lg:pr-10 lg:pl-12'
+                } bg-[#fcf9f3] ${
+                  mobilePage === 'left' ? 'block' : 'hidden lg:flex'
+                }`}
+              >
+                {leftPage}
+              </div>
 
-            {/* Right Page (Recto in LTR) */}
-            <div
-              className={`w-full min-h-[740px] flex flex-col justify-between p-3 sm:p-6 lg:p-10 ${
-                isRtl ? 'lg:pr-10 lg:pl-12' : 'lg:pl-10 lg:pr-12'
-              } bg-[#fdfbf7] ${
-                mobilePage === 'right' ? 'block' : 'hidden lg:flex'
-              }`}
-            >
-              {rightPage}
+              {/* Right Page (Recto in LTR) */}
+              <div
+                className={`w-full min-h-[740px] flex flex-col justify-between p-3 sm:p-6 lg:p-10 ${
+                  isRtl ? 'lg:pr-10 lg:pl-12' : 'lg:pl-10 lg:pr-12'
+                } bg-[#fdfbf7] ${
+                  mobilePage === 'right' ? 'block' : 'hidden lg:flex'
+                }`}
+              >
+                {rightPage}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

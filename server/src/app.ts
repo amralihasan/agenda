@@ -16,6 +16,7 @@ import { voiceNotesRouter } from './routes/voice-notes.routes.js';
 import { imagesRouter } from './routes/images.routes.js';
 import { categoriesRouter } from './routes/categories.routes.js';
 import { authRouter } from './routes/auth.routes.js';
+import { searchRouter } from './routes/search.routes.js';
 import { requireAuth } from './middleware/auth.middleware.js';
 
 const candidateDistPaths = [
@@ -51,6 +52,7 @@ app.use('/api/images', imagesRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/backup', backupRouter);
+app.use('/api/search', searchRouter);
 
 // Serve frontend static files
 app.use(express.static(clientDist));

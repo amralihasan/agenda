@@ -10,6 +10,41 @@ export interface Category {
   color: string;
 }
 
+export interface SearchResultItem {
+  id: string;
+  scope: 'daily' | 'monthly' | 'notes';
+  kind:
+    | 'event'
+    | 'task'
+    | 'priority'
+    | 'daily-note'
+    | 'monthly-intention'
+    | 'monthly-memo'
+    | 'note';
+  title: string;
+  description: string | null;
+  date: string | null;
+  year?: number;
+  month?: number;
+  dayOfWeek?: number | null;
+  timeRange?: string | null;
+  category?: string | null;
+  color?: string | null;
+  images: Array<{
+    id: string;
+    caption: string | null;
+    imageData: string;
+    createdAt: string;
+  }>;
+  voiceNotes: Array<{
+    id: string;
+    title: string | null;
+    audioData: string;
+    duration: number;
+    createdAt: string;
+  }>;
+}
+
 export interface Task {
   id: string;
   title: string;

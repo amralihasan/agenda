@@ -253,6 +253,23 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Global Agenda Search
+  searchAgenda: (params: {
+    q?: string;
+    scope?: 'all' | 'daily' | 'monthly' | 'notes';
+    dayName?: string;
+    month?: string;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params.q) sp.append('q', params.q);
+    if (params.scope && params.scope !== 'all') sp.append('scope', params.scope);
+    if (params.dayName && params.dayName !== 'all') sp.append('dayName', params.dayName);
+    if (params.month && params.month !== 'all') sp.append('month', params.month);
+    return fetchJson<{ results: import('../types').SearchResultItem[]; total: number }>(
+      `/search?${sp.toString()}`
+    );
+  },
   updateCategory: (id: string, data: { name?: string; color?: string }) =>
     fetchJson<import('../types').Category>(`/categories/${id}`, {
       method: 'PUT',

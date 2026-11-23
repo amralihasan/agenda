@@ -36,6 +36,7 @@
     "weekly": "WEEKLY",
     "monthly": "MONTHLY",
     "notes": "NOTES",
+    "search": "SEARCH",
     "settings": "SETTINGS"
   },
   "daily": {
@@ -265,5 +266,36 @@
     "categoryExists": "A category with this name already exists.",
     "all": "All Folios",
     "manageButton": "Categories"
+  },
+  "search": {
+    "eyebrow": "Agenda Index & Archive",
+    "title": "Search Agenda",
+    "placeholder": "Search events, tasks, notes, monthly goals, or media...",
+    "clear": "Clear search",
+    "searching": "Searching...",
+    "resultsCount": "results",
+    "dayFilter": "Filter by day",
+    "monthFilter": "Filter by month",
+    "allDays": "All Days",
+    "allMonths": "All Months",
+    "reset": "Reset",
+    "open": "Open",
+    "recording": "Recording",
+    "noResults": "No entries match your search or filters.",
+    "scopes": {
+      "all": "All",
+      "daily": "Daily",
+      "monthly": "Monthly",
+      "notes": "Notes"
+    },
+    "kinds": {
+      "event": "Daily Event",
+      "task": "Daily Task",
+      "priority": "Priority",
+      "daily-note": "Daily Note",
+      "monthly-intention": "Monthly Goal",
+      "monthly-memo": "Monthly Memo",
+      "note": "Note"
+    }
   }
 }

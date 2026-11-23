@@ -17,6 +17,7 @@ import { NotesRectoPage } from './components/notes/NotesRectoPage';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { CategoryManagerDialog } from './components/notes/CategoryManagerDialog';
 import { LoginPage } from './components/auth/LoginPage';
+import { SearchPage } from './components/search/SearchPage';
 import { api, clearToken, getToken } from './services/api';
 import { Loader2 } from 'lucide-react';
 import {
@@ -466,8 +467,27 @@ const AgendaApp: React.FC<{ user: AuthUser; onLogout: () => void }> = ({
   // Render content according to active section
   let leftPageContent: React.ReactNode = null;
   let rightPageContent: React.ReactNode = null;
+  let singlePageContent: React.ReactNode = null;
 
-  if (activeSection === 'daily') {
+  if (activeSection === 'search') {
+    singlePageContent = (
+      <SearchPage
+        onOpenDailyDate={(dateStr) => {
+          setCurrentDate(dateStr);
+          setActiveSection('daily');
+        }}
+        onOpenMonthlyDate={(year, month) => {
+          const monthStr = month.toString().padStart(2, '0');
+          setCurrentDate(`${year}-${monthStr}-01`);
+          setActiveSection('monthly');
+        }}
+        onOpenNote={(noteId) => {
+          setSelectedNoteId(noteId);
+          setActiveSection('notes');
+        }}
+      />
+    );
+  } else if (activeSection === 'daily') {
     leftPageContent = (
       <DailyVersoPage
         date={currentDate}
@@ -608,6 +628,7 @@ const AgendaApp: React.FC<{ user: AuthUser; onLogout: () => void }> = ({
           }}
           leftPage={leftPageContent}
           rightPage={rightPageContent}
+          singlePage={singlePageContent}
           mobilePage={mobilePage}
           onMobilePageChange={setMobilePage}
         />
