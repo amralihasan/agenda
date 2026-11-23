@@ -66,10 +66,12 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
   if (isAddingNew && editingPos !== null) displayPositions.push(editingPos);
   displayPositions.sort((a, b) => a - b);
 
-  // Format hours array based on settings
-  const hours: string[] = [];
+  // Format 30-minute time slots array based on settings (e.g. 06:00, 06:30, 07:00, ...)
+  const timeSlots: string[] = [];
   for (let h = startHour; h <= endHour; h++) {
-    hours.push(`${h.toString().padStart(2, '0')}:00`);
+    const hh = h.toString().padStart(2, '0');
+    timeSlots.push(`${hh}:00`);
+    timeSlots.push(`${hh}:30`);
   }
 
   // Handle start editing priority
@@ -337,7 +339,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
 
             {/* Schedule Row Items sitting directly on horizontal rules */}
             {(() => {
-              const ROW_HEIGHT = 36;
+              const SLOT_HEIGHT = 34; // 34px per 30-min slot (68px per hour)
               const gridStartMin = startHour * 60;
               const gridEndMin = (endHour + 1) * 60;
 
@@ -400,36 +402,46 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
 
               return (
                 <div className="relative">
-                  {/* Hour Grid Rows */}
+                  {/* 30-Minute Grid Rows */}
                   <div className="border-b border-[#e5e2dc]/80 text-[#1c1c18]">
-                    {hours.map((hour) => {
-                      const slotHour = parseInt(hour.slice(0, 2), 10);
-                      const slotStart = slotHour * 60;
-                      const slotEnd = (slotHour + 1) * 60;
+                    {timeSlots.map((slot) => {
+                      const slotStart = toMinutes(slot);
+                      const slotEnd = slotStart + 30;
+                      const isHalfHour = slot.endsWith(':30');
                       const isOccupied = laidOutEvents.some(
                         (item) => item.start < slotEnd && item.end > slotStart
                       );
-                      const isBoundaryHour = laidOutEvents.some(
+                      const isBoundaryTime = laidOutEvents.some(
                         (item) => item.start === slotStart || item.end === slotStart
                       );
 
                       return (
                         <div
-                          key={hour}
-                          style={{ height: `${ROW_HEIGHT}px` }}
-                          className="relative border-t border-[#e5e2dc]/80 flex items-center justify-between group hover:bg-[#f6f3ed]/60 transition-colors"
+                          key={slot}
+                          style={{ height: `${SLOT_HEIGHT}px` }}
+                          className={`relative flex items-center justify-between group hover:bg-[#f6f3ed]/60 transition-colors ${
+                            isHalfHour
+                              ? 'border-t border-dashed border-[#e5e2dc]/60'
+                              : 'border-t border-[#e5e2dc]/90'
+                          }`}
                         >
-                          {/* Time Label aligned to the top hour rule */}
+                          {/* Time Label aligned to the top rule */}
                           <span
-                            className={`self-start -mt-[8px] font-label-mono text-[11px] leading-none bg-[#fcf9f3] ${
-                              isOccupied || isBoundaryHour ? 'text-[#832613] font-bold' : 'text-[#675d52]'
+                            className={`self-start -mt-[7px] font-label-mono leading-none bg-[#fcf9f3] ${
+                              isHalfHour ? 'text-[10px]' : 'text-[11px]'
+                            } ${
+                              isOccupied || isBoundaryTime
+                                ? 'text-[#832613] font-bold'
+                                : isHalfHour
+                                ? 'text-[#675d52]/65'
+                                : 'text-[#675d52]'
                             } ${
                               isRtl
                                 ? '-mr-11 sm:-mr-14 w-10 sm:w-13 text-left pl-2'
                                 : '-ml-11 sm:-ml-14 w-10 sm:w-13 text-right pr-2'
                             } shrink-0 select-none`}
                           >
-                            {hour}
+                            {slot}
                           </span>
 
                           {/* Clickable empty slot */}
@@ -437,7 +449,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                             {!isOccupied && (
                               <button
                                 type="button"
-                                onClick={() => onAddEventClick(hour)}
+                                onClick={() => onAddEventClick(slot)}
                                 className="text-left rtl:text-right w-full h-full opacity-0 group-hover:opacity-100 flex items-center gap-1.5 text-xs text-[#675d52]/60 italic font-body-script hover:text-[#832613] transition-opacity cursor-pointer"
                               >
                                 <Plus className="w-3 h-3 text-[#832613]/70 shrink-0" />
@@ -453,8 +465,8 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                   {/* Spanning Event Selection Blocks */}
                   <div className="absolute inset-0 pointer-events-none">
                     {laidOutEvents.map(({ ev, start, end, col, totalCols }) => {
-                      const topPx = ((start - gridStartMin) / 60) * ROW_HEIGHT + 2;
-                      const heightPx = Math.max(((end - start) / 60) * ROW_HEIGHT - 4, 24);
+                      const topPx = ((start - gridStartMin) / 30) * SLOT_HEIGHT + 2;
+                      const heightPx = Math.max(((end - start) / 30) * SLOT_HEIGHT - 4, 24);
                       const widthPct = 100 / totalCols;
                       const startPct = col * widthPct;
                       const preset = getEventColorPreset(ev.color);
@@ -479,34 +491,34 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                           }}
                           className={`pointer-events-auto absolute rounded-sm ${
                             isRtl ? 'border-r-[3px]' : 'border-l-[3px]'
-                          } px-3.5 flex items-center justify-between gap-2 cursor-pointer transition-colors shadow-2xs overflow-hidden`}
+                          } px-3.5 py-1 flex items-center justify-between gap-3 cursor-pointer transition-colors shadow-2xs`}
                         >
-                          <div className="flex flex-col justify-center min-w-0 font-body-script leading-tight">
-                            <span className="text-[#080c12] font-medium text-sm sm:text-base truncate">
+                          <div className="flex flex-col justify-center min-w-0 font-body-script leading-snug">
+                            <span className="text-[#080c12] font-medium text-sm sm:text-base whitespace-normal break-words">
                               {ev.title}
                             </span>
                             {ev.description && (
-                              <span className="text-[#675d52] italic text-xs truncate">
+                              <span className="text-[#675d52] italic text-xs whitespace-normal break-words">
                                 {ev.description}
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex flex-col items-end justify-center gap-0.5 shrink-0 leading-tight">
+                            <span
+                              className="font-label-mono text-[10px] whitespace-nowrap opacity-90"
+                              style={{ color: preset.accent }}
+                            >
+                              {ev.startTime}–{ev.endTime}
+                            </span>
                             {ev.category && (
                               <span
-                                className="font-label-mono text-[10px]"
+                                className="font-label-mono text-[10px] whitespace-nowrap opacity-80"
                                 style={{ color: preset.accent }}
                               >
                                 {ev.category}
                               </span>
                             )}
-                            <span
-                              className="font-label-mono text-[10px] whitespace-nowrap opacity-85"
-                              style={{ color: preset.accent }}
-                            >
-                              {ev.startTime}–{ev.endTime}
-                            </span>
                           </div>
                         </div>
                       );
