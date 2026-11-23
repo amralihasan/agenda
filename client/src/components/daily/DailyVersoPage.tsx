@@ -400,7 +400,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
               return (
                 <div className="relative">
                   {/* Hour Grid Rows */}
-                  <div className="divide-y divide-[#e5e2dc]/80 text-[#1c1c18]">
+                  <div className="border-b border-[#e5e2dc]/80 text-[#1c1c18]">
                     {hours.map((hour) => {
                       const slotHour = parseInt(hour.slice(0, 2), 10);
                       const slotStart = slotHour * 60;
@@ -408,17 +408,20 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
                       const isOccupied = laidOutEvents.some(
                         (item) => item.start < slotEnd && item.end > slotStart
                       );
+                      const isBoundaryHour = laidOutEvents.some(
+                        (item) => item.start === slotStart || item.end === slotStart
+                      );
 
                       return (
                         <div
                           key={hour}
                           style={{ height: `${ROW_HEIGHT}px` }}
-                          className="flex items-center justify-between group hover:bg-[#f6f3ed]/60 transition-colors"
+                          className="relative border-t border-[#e5e2dc]/80 flex items-center justify-between group hover:bg-[#f6f3ed]/60 transition-colors"
                         >
-                          {/* Time Label on margin */}
+                          {/* Time Label aligned to the top hour rule */}
                           <span
-                            className={`font-label-mono text-[11px] ${
-                              isOccupied ? 'text-[#832613] font-bold' : 'text-[#675d52]'
+                            className={`self-start -mt-[8px] font-label-mono text-[11px] leading-none bg-[#fcf9f3] ${
+                              isOccupied || isBoundaryHour ? 'text-[#832613] font-bold' : 'text-[#675d52]'
                             } ${
                               isRtl
                                 ? '-mr-11 sm:-mr-14 w-10 sm:w-13 text-left pl-2'
