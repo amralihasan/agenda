@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Leather Agenda Cover -->
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#490800" />
+  <rect x="5" y="5" width="54" height="54" rx="11" stroke="#c5a059" stroke-opacity="0.45" stroke-width="1.5" />
+
+  <!-- Ivory Paper Folio -->
+  <rect x="13" y="11" width="38" height="42" rx="3" fill="#fcf9f3" />
+  <!-- Spine Accent -->
+  <rect x="13" y="11" width="6" height="42" rx="1.5" fill="#832613" />
+
+  <!-- Ruled Paper Lines -->
+  <line x1="23" y1="21" x2="45" y2="21" stroke="#d2c4b7" stroke-width="2" stroke-linecap="round" />
+  <line x1="23" y1="28" x2="45" y2="28" stroke="#d2c4b7" stroke-width="2" stroke-linecap="round" />
+  <line x1="23" y1="35" x2="40" y2="35" stroke="#d2c4b7" stroke-width="2" stroke-linecap="round" />
+  <line x1="23" y1="42" x2="36" y2="42" stroke="#d2c4b7" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Carmine Ribbon Bookmark -->
+  <path d="M39 11H45V26L42 23L39 26V11Z" fill="#832613" />
+
+  <!-- Gold Nib / Pen Accent -->
+  <circle cx="42" cy="43" r="3" fill="#c5a059" />
+</svg>
