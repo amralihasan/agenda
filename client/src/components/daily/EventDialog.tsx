@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { format, parseISO } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
+import { Calendar, Clock, Tag, Trash2, X } from 'lucide-react';
 import { ScheduleEvent } from '../../types';
 
 interface EventDialogProps {
@@ -19,15 +22,57 @@ export const EventDialog: React.FC<EventDialogProps> = ({
   initialEvent,
   defaultDate,
 }) => {
-  const { t } = useTranslation();
-  const [title, setTitle] = useState(initialEvent?.title || '');
-  const [description, setDescription] = useState(initialEvent?.description || '');
-  const [startTime, setStartTime] = useState(initialEvent?.startTime || '09:00');
-  const [endTime, setEndTime] = useState(initialEvent?.endTime || '10:00');
-  const [category, setCategory] = useState(initialEvent?.category || '');
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('10:00');
+  const [category, setCategory] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Sync form state whenever dialog opens or target event/hour changes
+  useEffect(() => {
+    if (!isOpen) return;
+    setTitle(initialEvent?.title || '');
+    setDescription(initialEvent?.description || '');
+    setStartTime(initialEvent?.startTime || '09:00');
+    setEndTime(initialEvent?.endTime || '10:00');
+    setCategory(initialEvent?.category || '');
+
+    const timer = setTimeout(() => {
+      titleInputRef.current?.focus();
+    }, 30);
+    return () => clearTimeout(timer);
+  }, [isOpen, initialEvent]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !loading) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, loading, onClose]);
+
   if (!isOpen) return null;
+
+  const isEditing = Boolean(initialEvent?.id);
+
+  let formattedDate = defaultDate;
+  try {
+    formattedDate = format(parseISO(defaultDate), 'EEE, d MMM yyyy', {
+      locale: isRtl ? ar : enUS,
+    });
+  } catch {
+    // Fallback to raw defaultDate
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,112 +111,149 @@ export const EventDialog: React.FC<EventDialogProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-lg bg-[#fcf9f3] text-[#1c1c18] rounded-sm p-6 sm:p-8 shadow-book border border-[#dcdad4]">
-        <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#e5e2dc]">
-          <h3 className="font-headline-md text-headline-md text-[#1e2229]">
-            {t('dialogs.eventTitle')}
-          </h3>
-          <span className="font-label-stamp text-[10px] text-[#832613] uppercase tracking-widest">
-            {defaultDate}
-          </span>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !loading) onClose();
+      }}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
+      <div className="relative w-full max-w-md bg-[#fcf9f3] text-[#1c1c18] rounded-md shadow-book border border-[#dcdad4] overflow-hidden">
+        {/* Clean Header */}
+        <div className="flex items-center justify-between gap-3 px-6 py-4 bg-[#f6f3ed]/70 border-b border-[#e5e2dc]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h3 className="font-headline-md text-lg text-[#080c12] truncate">
+              {isEditing ? t('dialogs.eventEditTitle') : t('dialogs.eventTitle')}
+            </h3>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/80 border border-[#e5e2dc] font-label-mono text-[11px] text-[#832613] whitespace-nowrap">
+              <Calendar className="w-3 h-3" />
+              {formattedDate}
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="p-1 rounded text-[#675d52] hover:text-[#080c12] hover:bg-[#e5e2dc]/60 transition-colors cursor-pointer"
+              aria-label={t('dialogs.cancel')}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Title */}
           <div>
-            <label className="block font-caption-caps text-caption-caps uppercase text-[#675d52] tracking-wider mb-1">
+            <label className="block font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
               {t('dialogs.eventTitleLabel')}
             </label>
             <input
+              ref={titleInputRef}
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('dialogs.eventTitlePlaceholder')}
               required
-              className="w-full bg-transparent border-b border-[#76777c] pb-1.5 font-body-md text-body-md text-[#080c12] placeholder:text-[#675d52]/50 placeholder:italic focus:outline-none focus:border-[#832613]"
+              className="w-full bg-white/80 border border-[#dcdad4] rounded-sm px-3 py-2 font-body-md text-base text-[#080c12] placeholder:text-[#675d52]/45 focus:outline-none focus:border-[#832613] transition-colors"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-caption-caps text-caption-caps uppercase text-[#675d52] tracking-wider mb-1">
-                {t('dialogs.startTime')}
-              </label>
-              <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-                className="w-full bg-transparent border-b border-[#76777c] pb-1 font-label-mono text-sm text-[#080c12] focus:outline-none focus:border-[#832613]"
-              />
+          {/* Time Slot */}
+          <div className="bg-[#f6f3ed]/60 border border-[#e5e2dc] rounded-sm p-3">
+            <div className="flex items-center gap-1.5 font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-2">
+              <Clock className="w-3.5 h-3.5 text-[#832613]" />
+              <span>{t('dialogs.eventTimeLabel')}</span>
             </div>
-            <div>
-              <label className="block font-caption-caps text-caption-caps uppercase text-[#675d52] tracking-wider mb-1">
-                {t('dialogs.endTime')}
-              </label>
-              <input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-                className="w-full bg-transparent border-b border-[#76777c] pb-1 font-label-mono text-sm text-[#080c12] focus:outline-none focus:border-[#832613]"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-label-mono text-[#675d52] mb-1">
+                  {t('dialogs.startTime')}
+                </label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                  className="w-full bg-white border border-[#dcdad4] rounded-sm px-2.5 py-1.5 font-label-mono text-sm text-[#080c12] focus:outline-none focus:border-[#832613]"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-label-mono text-[#675d52] mb-1">
+                  {t('dialogs.endTime')}
+                </label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                  className="w-full bg-white border border-[#dcdad4] rounded-sm px-2.5 py-1.5 font-label-mono text-sm text-[#080c12] focus:outline-none focus:border-[#832613]"
+                />
+              </div>
             </div>
           </div>
 
+          {/* Category */}
           <div>
-            <label className="block font-caption-caps text-caption-caps uppercase text-[#675d52] tracking-wider mb-1">
-              {t('dialogs.eventCategoryLabel')}
+            <label className="flex items-center gap-1.5 font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
+              <Tag className="w-3 h-3" />
+              <span>{t('dialogs.eventCategoryLabel')}</span>
             </label>
             <input
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder={t('dialogs.eventCategoryPlaceholder')}
-              className="w-full bg-transparent border-b border-[#76777c] pb-1.5 font-body-md text-sm text-[#080c12] placeholder:text-[#675d52]/50 placeholder:italic focus:outline-none focus:border-[#832613]"
+              className="w-full bg-white/80 border border-[#dcdad4] rounded-sm px-3 py-1.5 font-body-md text-sm text-[#080c12] placeholder:text-[#675d52]/45 focus:outline-none focus:border-[#832613] transition-colors"
             />
           </div>
 
+          {/* Notes */}
           <div>
-            <label className="block font-caption-caps text-caption-caps uppercase text-[#675d52] tracking-wider mb-1">
+            <label className="block font-label-stamp text-[11px] uppercase text-[#675d52] tracking-wider mb-1.5">
               {t('dialogs.eventDescriptionLabel')}
             </label>
             <textarea
-              rows={2}
+              rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('dialogs.eventDescriptionPlaceholder')}
-              className="w-full bg-transparent border border-[#dcdad4] p-2 font-body-script text-sm text-[#080c12] placeholder:text-[#675d52]/50 placeholder:italic focus:outline-none focus:border-[#832613]"
+              className="w-full bg-white/80 border border-[#dcdad4] rounded-sm px-3 py-2 font-body-script text-sm text-[#080c12] placeholder:text-[#675d52]/45 focus:outline-none focus:border-[#832613] transition-colors resize-none"
             />
           </div>
 
-          <div className="pt-4 flex items-center justify-between border-t border-[#e5e2dc]">
+          {/* Footer Actions */}
+          <div className="pt-3 flex items-center justify-between border-t border-[#e5e2dc]">
             <div>
-              {initialEvent?.id && onDelete && (
+              {isEditing && onDelete && (
                 <button
                   type="button"
                   onClick={handleDelete}
                   disabled={loading}
-                  className="px-3 py-1 text-xs font-label-mono text-[#ba1a1a] hover:underline"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-xs font-label-mono text-[#ba1a1a] hover:bg-[#fee2e2]/60 transition-colors cursor-pointer"
                 >
-                  {t('dialogs.delete')}
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{t('dialogs.delete')}</span>
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-3.5 py-1.5 text-xs font-label-mono text-[#675d52] hover:text-[#1c1c18]"
+                className="px-3.5 py-1.5 text-xs font-label-mono text-[#675d52] hover:text-[#080c12] hover:bg-[#e5e2dc]/50 rounded-sm transition-colors cursor-pointer"
               >
                 {t('dialogs.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-1.5 text-xs font-label-stamp bg-[#832613] text-[#ffffff] hover:bg-[#6e1e0d] uppercase tracking-wider rounded-sm shadow-sm transition-colors"
+                className="px-4 py-1.5 text-xs font-label-stamp bg-[#832613] text-white hover:bg-[#6e1e0d] uppercase tracking-wider rounded-sm shadow-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {loading ? '...' : t('dialogs.save')}
               </button>

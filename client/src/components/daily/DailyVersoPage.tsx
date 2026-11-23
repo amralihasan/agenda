@@ -102,33 +102,29 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
     <div className="flex-1 flex flex-col justify-between relative select-text">
       <div>
         {/* Top Folio Header & Quick Date Switcher */}
-        <div className="flex items-baseline justify-between pb-1.5 mb-2 border-b border-[#e5e2dc]/60">
-          <div className="flex items-center gap-2">
-            <span className="font-label-stamp text-[11px] text-[#832613] tracking-widest uppercase">
-              {isRtl ? `صحيفة ${folioNumber} / ظهر` : `Folio ${folioNumber} / Verso`}
-            </span>
-            <span className="font-label-mono text-xs text-[#675d52] opacity-40">·</span>
-            <span className="font-label-mono text-xs text-[#675d52]">
-              {isRtl ? `رقم ${folioNumber}` : `N° ${folioNumber}`}
-            </span>
-          </div>
+        <div className="flex items-center justify-between gap-2 pb-2 mb-3 border-b border-[#e5e2dc]/60">
+          <span className="font-label-stamp text-[11px] text-[#832613] tracking-widest uppercase whitespace-nowrap">
+            {isRtl ? `صحيفة ${folioNumber}` : `Folio ${folioNumber}`}
+          </span>
 
-          <div className="flex items-center gap-1 font-label-mono text-xs text-[#675d52]">
+          <div className="flex items-center gap-1.5 font-label-mono text-xs text-[#675d52] whitespace-nowrap">
             <button
+              type="button"
               onClick={() => onDateChange(format(prevDate, 'yyyy-MM-dd'))}
-              className="hover:text-[#080c12] transition-colors flex items-center gap-0.5 group"
+              className="px-1.5 py-0.5 rounded hover:bg-[#f6f3ed] hover:text-[#080c12] transition-colors flex items-center gap-0.5 cursor-pointer"
             >
               {isRtl ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
               <span>{format(prevDate, 'd MMM', { locale: isRtl ? ar : enUS })}</span>
             </button>
             <span className="opacity-30">|</span>
-            <span className="font-label-stamp text-xs text-[#080c12] font-bold uppercase">
+            <span className="px-1.5 py-0.5 font-label-stamp text-xs text-[#080c12] font-bold">
               {format(dateObj, 'd MMM', { locale: isRtl ? ar : enUS })}
             </span>
             <span className="opacity-30">|</span>
             <button
+              type="button"
               onClick={() => onDateChange(format(nextDate, 'yyyy-MM-dd'))}
-              className="hover:text-[#080c12] transition-colors flex items-center gap-0.5 group"
+              className="px-1.5 py-0.5 rounded hover:bg-[#f6f3ed] hover:text-[#080c12] transition-colors flex items-center gap-0.5 cursor-pointer"
             >
               <span>{format(nextDate, 'd MMM', { locale: isRtl ? ar : enUS })}</span>
               {isRtl ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -137,24 +133,18 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
         </div>
 
         {/* Date Header */}
-        <header className="mb-4">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 border-b border-[#e5e2dc] pb-2">
-            <div>
-              <span className="block font-caption-caps text-caption-caps text-[#832613] uppercase tracking-[0.22em]">
-                {t('daily.horariumTitle')}
-              </span>
-              <h1 className="font-headline-lg text-2xl sm:text-3xl text-[#080c12] tracking-wide uppercase mt-0.5">
-                {dayName} · {dayNumber} {monthYear}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 font-label-mono text-xs text-[#675d52] self-start sm:self-auto">
-              <span>
-                {t('app.day')} {dayOfYear} {t('app.of')} {totalDays}
-              </span>
-              <span className="opacity-40">§</span>
-              <span className="text-[#45474b] font-medium">{isRtl ? 'أحدب متزايد 🌔' : 'Waxing Gibbous 🌔'}</span>
-            </div>
+        <header className="mb-4 pb-2.5 border-b border-[#e5e2dc]">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <span className="font-caption-caps text-caption-caps text-[#832613] uppercase tracking-[0.18em]">
+              {t('daily.horariumTitle')}
+            </span>
+            <span className="font-label-mono text-xs text-[#675d52] whitespace-nowrap shrink-0">
+              {t('app.day')} {dayOfYear} / {totalDays}
+            </span>
           </div>
+          <h1 className="font-headline-lg text-xl sm:text-2xl text-[#080c12] tracking-normal leading-snug">
+            {dayName}, {dayNumber} {monthYear}
+          </h1>
         </header>
 
         {/* Section 1: Today's Priorities */}

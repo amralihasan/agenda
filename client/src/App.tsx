@@ -317,8 +317,11 @@ const AgendaApp: React.FC<{ user: AuthUser; onLogout: () => void }> = ({
 
   // Schedule event actions
   const handleAddEventClick = (hour: string) => {
-    const endH = parseInt(hour.slice(0, 2), 10) + 1;
-    const endStr = `${endH.toString().padStart(2, '0')}:00`;
+    const startH = parseInt(hour.slice(0, 2), 10);
+    const endStr =
+      startH >= 23
+        ? '23:59'
+        : `${(startH + 1).toString().padStart(2, '0')}:00`;
     setActiveEventForDialog({
       startTime: hour,
       endTime: endStr,
