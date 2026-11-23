@@ -215,6 +215,20 @@
   border-radius: 2px;
 }
 
+.rich-note-editor a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-decoration-color: rgba(29, 78, 216, 0.45);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  word-break: break-word;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.rich-note-editor a:hover {
+  color: #832613;
+  text-decoration-color: #832613;
+}
+
 /* Inline Code in Rich Editor */
 .rich-note-editor code:not(pre code) {
   background-color: #f1f5f9;

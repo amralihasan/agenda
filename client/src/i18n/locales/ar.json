@@ -111,7 +111,14 @@
     "highlighter": "تمييز اللون",
     "undo": "تراجع",
     "redo": "إعادة",
-    "deleteCodeBlock": "حذف كتلة الكود"
+    "deleteCodeBlock": "حذف كتلة الكود",
+    "insertLink": "إدراج رابط",
+    "openLink": "فتح",
+    "copyLink": "نسخ",
+    "linkCopied": "تم النسخ",
+    "unlink": "إزالة الرابط",
+    "linkUrlPlaceholder": "https://example.com",
+    "applyLink": "تطبيق"
   },
   "weekly": {
     "semestrialFocus": "أولويات وأهداف الأسبوع الكبرى",

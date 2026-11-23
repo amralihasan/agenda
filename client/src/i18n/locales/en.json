@@ -111,7 +111,14 @@
     "highlighter": "Highlight",
     "undo": "Undo",
     "redo": "Redo",
-    "deleteCodeBlock": "Delete Code Block"
+    "deleteCodeBlock": "Delete Code Block",
+    "insertLink": "Insert Link",
+    "openLink": "Open",
+    "copyLink": "Copy",
+    "linkCopied": "Copied",
+    "unlink": "Unlink",
+    "linkUrlPlaceholder": "https://example.com",
+    "applyLink": "Apply"
   },
   "weekly": {
     "semestrialFocus": "I. Weekly Focus & Major Objectives",
