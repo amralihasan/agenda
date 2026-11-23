@@ -66,12 +66,14 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
   if (isAddingNew && editingPos !== null) displayPositions.push(editingPos);
   displayPositions.sort((a, b) => a - b);
 
-  // Format 30-minute time slots array based on settings (e.g. 06:00, 06:30, 07:00, ...)
+  // Format 30-minute time slots array based on settings (e.g. 09:00, 09:30, ..., 15:00)
   const timeSlots: string[] = [];
   for (let h = startHour; h <= endHour; h++) {
     const hh = h.toString().padStart(2, '0');
     timeSlots.push(`${hh}:00`);
-    timeSlots.push(`${hh}:30`);
+    if (h < endHour) {
+      timeSlots.push(`${hh}:30`);
+    }
   }
 
   // Handle start editing priority
@@ -341,7 +343,7 @@ export const DailyVersoPage: React.FC<DailyVersoPageProps> = ({
             {(() => {
               const SLOT_HEIGHT = 34; // 34px per 30-min slot (68px per hour)
               const gridStartMin = startHour * 60;
-              const gridEndMin = (endHour + 1) * 60;
+              const gridEndMin = endHour * 60 + 30;
 
               const toMinutes = (tStr: string) => {
                 const [hh, mm] = tStr.split(':').map((n) => parseInt(n, 10));
